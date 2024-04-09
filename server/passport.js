@@ -10,9 +10,20 @@ passport.deserializeUser((user, done) => {
     done(null, user);
 });
 
+// Check environment
+const clientID = process.env.GOOGLE_CLIENT_ID
+if (!clientID) {
+    console.error('GOOGLE_CLIENT_ID not populated');
+}
+
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+if (!clientSecret) {
+    console.error('GOOGLE_CLIENT_SECRET not populated');
+}
+
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    clientID: clientID,
+    clientSecret: clientSecret,
     callbackURL: '/auth/google/callback',
     passReqToCallback: false
 },

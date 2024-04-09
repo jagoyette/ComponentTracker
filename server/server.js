@@ -3,8 +3,11 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const session = require("express-session");
 
+console.log('Loading environment now...');
+
 // Read .env file
 require("dotenv").config();
+console.log(process.env);
 
 // Connect to database
 const CONNECTION_STRING = process.env.CONNECTION_STRING || 'mongodb://localhost:27017/component-tracker';
