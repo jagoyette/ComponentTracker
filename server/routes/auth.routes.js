@@ -32,11 +32,8 @@ router.get('/google/callback',
 );
 
 // success - user authenticated via Google
-router.get('/google/callback/success', (req , res, next) => { 
-    if(!req.user)
-       res.redirect('../google/callback/failure'); 
-    else
-        res.send('OK');
+router.get('/google/callback/success', (req , res) => { 
+    res.send('OK');
 }); 
   
 // failure - user was not authenticated via Google
