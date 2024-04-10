@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "component-tracker": {
+    "component-tracker-app": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/component-tracker",
+            "outputPath": "dist/component-tracker-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -57,10 +57,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "component-tracker:build:production"
+              "buildTarget": "component-tracker-app:build:production"
             },
             "development": {
-              "buildTarget": "component-tracker:build:development"
+              "buildTarget": "component-tracker-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -68,7 +68,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "component-tracker:build"
+            "buildTarget": "component-tracker-app:build"
           }
         },
         "test": {

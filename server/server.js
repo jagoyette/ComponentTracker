@@ -14,6 +14,7 @@ mongoose.connect(CONNECTION_STRING)
 
 // Create server app
 const app = express();
+app.use(express.json());
 
 // Install session middleware
 app.use(session({
