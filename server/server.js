@@ -31,17 +31,6 @@ app.use(passport.session());
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
-app.use('/', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.write(`<p>Hello ${req.user?.displayName}  </p>`)
-    } else {
-        res.write('<p>You are currently logged out</p>')
-    }
-    res.write('<a href="/auth/login"><button>Login</button></a>');
-    res.write('<a href="/auth/logout"><button>Logout</button></a>');
-    res.end();
-});
-
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

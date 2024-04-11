@@ -1,11 +1,20 @@
 const express = require("express");
 const passport = require("passport");
+const { log } = require("util");
 
 const router = express.Router();
 
 // Login / Logout API
 router.get('/login', (req, res) => {
-    res.redirect('google/login');
+    // redirect to google
+    let loginProvider = 'google/login';
+
+    // add params if any
+    const params = new URLSearchParams(req.query);
+    if (params.size > 0) {
+        loginProvider += '?' + params.toString();
+    }
+    res.redirect(loginProvider);
 });
 
 router.get('/logout', function (req, res, next) {
@@ -16,27 +25,37 @@ router.get('/logout', function (req, res, next) {
 });
 
 // Login with Google workflow
-router.get('/google/login', 
+router.get('/google/login', (req, res, next) => {
+    // extract returnTo url and place into passport's state
+    const { returnTo } = req.query;
+    const state = returnTo ? JSON.stringify({returnTo}) : undefined;
     passport.authenticate('google', { 
-        scope: [ 'email', 'profile' ] 
-    })
-);
+        scope: [ 'email', 'profile' ],
+        state: state
+    })(req, res, next);
+});
 
 // Google Authentication callback
-router.get('/google/callback', 
+router.get('/google/callback', (req, res, next) => {
     passport.authenticate('google', {
-        successRedirect: '../google/callback/success',
         failureRedirect: '../google/callback/failure'
-    })
-);
+    })(req, res, next);
+}, (req, res) => {
+    // If we are here, login was successful
+    try {
+        // extract the returnTo param from state
+        const { state } = req.query;
+        if (state) {
+            const { returnTo } = JSON.parse(state);
+            if (typeof returnTo === 'string') {
+                return res.redirect(returnTo)
+            }
+        }
+    } catch (err) {
+        console.error(err);
+    }
+});
 
-// success - user authenticated via Google
-router.get('/google/callback/success', (req , res) => { 
-    res.send({
-        user: req.user
-    });
-}); 
-  
 // failure - user was not authenticated via Google
 router.get('/google/callback/failure', (req , res) => { 
     res.status(401).send({
