@@ -4,23 +4,14 @@ const { log } = require("util");
 
 const router = express.Router();
 
-// Login / Logout API
-router.get('/login', (req, res) => {
-    // redirect to google
-    let loginProvider = 'google/login';
-
-    // add params if any
-    const params = new URLSearchParams(req.query);
-    if (params.size > 0) {
-        loginProvider += '?' + params.toString();
-    }
-    res.redirect(loginProvider);
-});
-
+// Logout user
 router.get('/logout', function (req, res, next) {
     req.logOut(function (err) {
         if (err) { return next(err); }
-        res.redirect('/');
+        res.send({
+            result: "Success",
+            message: "User logged out"
+        });
     });
 });
 
