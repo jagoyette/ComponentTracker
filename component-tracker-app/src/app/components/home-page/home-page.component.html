@@ -1,3 +1,11 @@
-<p>Component Tracker</p>
+<h1>Component Tracker</h1>
 
-<a href="/login"><button>Login</button></a>
+<div [hidden]="user">
+    <!-- show login button when not logged in -->
+    <a href="/login"><button>Login</button></a>
+</div>
+
+<div [hidden]="!user">
+    <p>Welcome {{user?.name}}</p>
+    <button (click)="logout()">Logout</button>
+</div>

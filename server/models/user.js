@@ -23,8 +23,17 @@ const userSchema = new Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Helper method to locate authenticated user in database. A new
-// user is added if not found. The user is returned on success, null otherwise.
+User.findUserByProviderId = async function(provider, id) {
+    if (!id) {
+        return null;
+    }
+
+    // look for match in database
+    return await this.findOne({ id: id, provider: provider }).exec();    
+}
+
+// Helper method to locate a user in database based on supplied profile (passportjs).
+// A new user is added if not found. The user is returned on success, null otherwise.
 User.findOrCreateUser = async function(profile) {
     // validate profile
     if (!profile || !profile.id || !profile.provider) {

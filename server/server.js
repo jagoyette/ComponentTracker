@@ -2,12 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const session = require("express-session");
+const cors = require("cors")
 
 // Read .env file
 require("dotenv").config();
 
 // Connect to database
-const CONNECTION_STRING = process.env.CONNECTION_STRING || 'mongodb://localhost:27017/component-tracker';
+const CONNECTION_STRING = process.env.CONNECTION_STRING || 
+                        'mongodb://localhost:27017/component-tracker';
 mongoose.connect(CONNECTION_STRING)
     .then(console.log("Connected to database successfully."))
     .catch(err => console.log(err.reason));
@@ -15,6 +17,16 @@ mongoose.connect(CONNECTION_STRING)
 // Create server app
 const app = express();
 app.use(express.json());
+
+// Enable CORS
+const origins = process.env.CORS_ORIGINS?.split(';');
+if (origins) {
+    console.log('Setting CORS to ', origins);
+    app.use(cors({
+        origin: origins,
+        credentials: true
+    }));
+}
 
 // Install session middleware
 app.use(session({
