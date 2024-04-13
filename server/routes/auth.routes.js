@@ -30,6 +30,7 @@ router.get('/user',
 router.get('/google/login', (req, res, next) => {
     // extract returnTo url and place into passport's state
     const { returnTo } = req.query;
+    console.log('Starting Google login with returnTo: ' + returnTo);
     const state = returnTo ? JSON.stringify({returnTo}) : undefined;
     passport.authenticate('google', { 
         scope: [ 'email', 'profile' ],
@@ -40,6 +41,7 @@ router.get('/google/login', (req, res, next) => {
 // Google Authentication callback
 router.get('/google/callback', (req, res, next) => {
     try {
+        console.log('Google callback entered...');
         // Build redirect urls for the success and failure cases
         let redirectUrl = '/';
 
@@ -58,6 +60,7 @@ router.get('/google/callback', (req, res, next) => {
             appendSeparator = '&';
         }
 
+        console.log('Redirecting google login to ' + redirectUrl);
         // Let passport authenticate and redirect
         passport.authenticate('google', {
             successRedirect: redirectUrl + appendSeparator + 'success=true',
