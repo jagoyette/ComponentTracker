@@ -15,11 +15,11 @@ export class ComponentTrackerApiService {
 
   getCurrentUser(): Observable<User> {
     const url = this.baseUrl + 'auth/user'
-    return this.http.get<User>(url, {withCredentials: true});
+    return this.http.get<User>(url);
   }
 
   logout(): Observable<any> {
     const url = this.baseUrl + 'auth/logout'
-    return this.http.post(url, {withCredentials: true});
+    return this.http.post(url, null);
   }
 }
