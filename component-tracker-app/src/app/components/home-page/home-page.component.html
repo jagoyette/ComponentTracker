@@ -1,4 +1,4 @@
-<h1>Component Tracker</h1>
+<h3>Home</h3>
 
 <div [hidden]="user">
     <!-- show login button when not logged in -->
@@ -6,6 +6,7 @@
 </div>
 
 <div [hidden]="!user">
+    <!-- show logout button when logged in -->
     <p>Welcome {{user?.name}}</p>
     <button (click)="logout()">Logout</button>
 </div>
