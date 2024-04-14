@@ -1,6 +1,6 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const UserRepository = require("./models/user");
+const UserRepository = require("../models/user");
 
 passport.serializeUser((user, done) => {
     done(null, user);
@@ -29,3 +29,5 @@ if (clientID && clientSecret) {
 } else {
     console.warn('Google Login Strategy not implemented. Make sure CLIENT environment variables are populated.');
 }
+
+module.exports = passport;
