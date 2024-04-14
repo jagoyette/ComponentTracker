@@ -27,45 +27,59 @@ router.get('/user',
 );
 
 // Login with Google workflow
+// This route will redirect the user to authorize access using
+// their Google account. The route is intended to be displayed
+// by a browser (instead of a background fetch api). Upon 
+// completion, the user is redirected once to the callback
+// below. From the callback, the user is redirected to the
+// apps success or failure url depending on user authorization.
 router.get('/google/login', (req, res, next) => {
-    // extract returnTo url and place into passport's state
-    const { returnTo } = req.query;
-    console.log('Starting Google login with returnTo: ' + returnTo);
-    const state = returnTo ? JSON.stringify({returnTo}) : undefined;
+    // extract redirects and place into passport's state
+    let { successRedirect, failureRedirect } = req.query;
+
+    // Make sure redirects have sane defaults
+    successRedirect = successRedirect || '/';
+    failureRedirect = failureRedirect || '/google/login';
+    console.log(`Starting Google login with redirects => success: ${successRedirect}, failure: ${failureRedirect}`);
+    
+    // Initiate OAuth2 authentication flow
+    const state = JSON.stringify({ successRedirect, failureRedirect });
     passport.authenticate('google', { 
         scope: [ 'email', 'profile' ],
         state: state
     })(req, res, next);
 });
 
-// Google Authentication callback
+// Google Authentication callback - always called from above
+// login route. Use passport to determine results and redirect
+// user appropriately
 router.get('/google/callback', (req, res, next) => {
     try {
         console.log('Google callback entered...');
-        // Build redirect urls for the success and failure cases
-        let redirectUrl = '/';
 
-        // extract the returnTo param from state and use it if we have it
+        // initialize defaults for redirects
+        let successRedirect = '/';
+        let failureRedirect = '/google/login';
+
+        // extract the redirects from state and use it if we have it
         const { state } = req.query;
         if (state) {
-            const { returnTo } = JSON.parse(state);
-            if (typeof returnTo === 'string') {
-                redirectUrl = returnTo;
+            // Parse the string to get our object containing urls
+            const redirectUrls = JSON.parse(state);
+            if (redirectUrls?.successRedirect) {
+                successRedirect = redirectUrls.successRedirect;
             }
+            if (redirectUrls?.failureRedirect) {
+                failureRedirect = redirectUrls.failureRedirect;
+            }         
         }
 
-        // Check if we are appending params or starting new params
-        let appendSeparator = '?';
-        if (redirectUrl.includes('?')) {
-            appendSeparator = '&';
-        }
-
-        console.log('Redirecting google login to ' + redirectUrl);
         // Let passport authenticate and redirect
         passport.authenticate('google', {
-            successRedirect: redirectUrl + appendSeparator + 'success=true',
-            failureRedirect: redirectUrl + appendSeparator + 'success=false'
+            successRedirect,
+            failureRedirect
         })(req, res, next);
+
     } catch (err) {
         console.error(err);
     }
