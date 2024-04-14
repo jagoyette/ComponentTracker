@@ -3,11 +3,20 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const UserRepository = require("../models/user");
 
 passport.serializeUser((user, done) => {
-    done(null, user);
+    // Serialize our user with the unique id assigned
+    // by our DB. Note this is not the same as the user's
+    // profile id.
+    done(null, user._id);
 });
 
-passport.deserializeUser((user, done) => {
-    done(null, user);
+passport.deserializeUser(async (userUid, done) => {
+    try {
+        // Retrieve user using the DB unique ID
+        const user = await UserRepository.findById(userUid);
+        done(null, user);
+    } catch (error) {
+        done(error); 
+    }
 });
 
 // Register Google authentication strategy
