@@ -17,7 +17,8 @@
     "express-session": "^1.18.0",
     "mongoose": "^8.3.0",
     "nodemon": "^3.1.0",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport": "0.2.2",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-strava-oauth2": "^0.1.3"
   }
 }

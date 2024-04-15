@@ -85,5 +85,22 @@ router.get('/google/callback', (req, res, next) => {
     }
 });
 
+router.get('/strava/integrate',
+    passport.authenticate('strava', {
+        scope: ['activity:read_all'],
+        session: false
+    })
+);
+
+// strava callback url
+router.get('/strava/callback',
+    passport.authenticate('strava', {
+        failureRedirect: '../stava/failure',        
+    }), 
+    (req, res) => {
+        res.redirect('/');
+    }
+);
+
 // export the router
 module.exports = router;

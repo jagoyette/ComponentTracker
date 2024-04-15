@@ -1,31 +1,35 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const StravaStrategy = require("passport-strava-oauth2").Strategy;
+
 const UserRepository = require("../models/user");
+const StravaAthlete = require("../models/strava.athlete");
 
 passport.serializeUser((user, done) => {
     // Serialize our user with the unique id assigned
     // by our DB. Note this is not the same as the user's
     // profile id.
-    done(null, user._id);
+    done(null, user);
 });
 
-passport.deserializeUser(async (userUid, done) => {
-    try {
-        // Retrieve user using the DB unique ID
-        const user = await UserRepository.findById(userUid);
-        done(null, user);
-    } catch (error) {
-        done(error); 
-    }
+passport.deserializeUser((user, done) => {
+    // try {
+    //     // Retrieve user using the DB unique ID
+    //     const user = await UserRepository.findById(userUid);
+    //     done(null, user);
+    // } catch (error) {
+    //     done(error); 
+    // }
+    done(null, user);
 });
 
 // Register Google authentication strategy
-const clientID = process.env.GOOGLE_CLIENT_ID
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-if (clientID && clientSecret) {
+const googleClientID = process.env.GOOGLE_CLIENT_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+if (googleClientID && googleClientSecret) {
     passport.use(new GoogleStrategy({
-        clientID: clientID,
-        clientSecret: clientSecret,
+        clientID: googleClientID,
+        clientSecret: googleClientSecret,
         callbackURL: '/auth/google/callback',
         passReqToCallback: false
     },
@@ -37,6 +41,36 @@ if (clientID && clientSecret) {
     ));
 } else {
     console.warn('Google Login Strategy not implemented. Make sure CLIENT environment variables are populated.');
+}
+
+// Register Strava authentication strategy
+const stravaClientID = process.env.STRAVA_CLIENT_ID
+const stravaClientSecret = process.env.STRAVA_CLIENT_SECRET;
+if (stravaClientID && stravaClientSecret) {
+    passport.use(new StravaStrategy({
+        clientID: stravaClientID,
+        clientSecret: stravaClientSecret,
+        callbackURL: '/auth/strava/callback',
+        passReqToCallback: true
+    },
+        // Verify user function
+        async function(req, accessToken, refreshToken, params, profile, done) {
+            console.log('Success with strava');
+            const stravaAthlete = {
+                userId: req.user._id,
+                profile: profile,
+                token: {
+                    accessToken,
+                    refreshToken,
+                    expiresAt: new Date(params.expires_at*1000)
+                }
+            };
+            const athlete = await StravaAthlete.create(stravaAthlete) ;
+            return done(null, profile);
+        }
+    ));
+} else {
+    console.warn('Strava Login Strategy not implemented. Make sure CLIENT environment variables are populated.');
 }
 
 module.exports = passport;
