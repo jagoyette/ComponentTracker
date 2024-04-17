@@ -4,6 +4,7 @@ const StravaStrategy = require("passport-strava-oauth2").Strategy;
 
 const UserRepository = require("../models/user");
 const StravaAthlete = require("../models/strava.athlete");
+const StravaToken = require("../models/strava.token");
 
 passport.serializeUser((user, done) => {
     // Serialize our user with the unique id assigned
@@ -59,13 +60,21 @@ if (stravaClientID && stravaClientSecret) {
             const stravaAthlete = {
                 userId: req.user._id,
                 profile: profile,
-                token: {
-                    accessToken,
-                    refreshToken,
-                    expiresAt: new Date(params.expires_at*1000)
-                }
-            };
-            const athlete = await StravaAthlete.create(stravaAthlete) ;
+            };            
+
+            // Create the athlete
+            const athleteModel = await StravaAthlete.create(stravaAthlete);
+
+            // Store the access tokens
+            const stravaToken = {
+                userId: req.user._id,
+                accessToken,
+                refreshToken,
+                expiresAt: new Date(params.expires_at*1000)
+            }
+            const tokenModel = await StravaToken.create(stravaToken);
+
+            // Finally return with our profile
             return done(null, profile);
         }
     ));

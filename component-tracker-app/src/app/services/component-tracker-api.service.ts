@@ -22,4 +22,9 @@ export class ComponentTrackerApiService {
     const url = this.baseUrl + 'auth/logout'
     return this.http.post(url, null);
   }
+
+  checkStravaIntegration(): Observable<any> {
+    const url = this.baseUrl + 'auth/strava/integration'
+    return this.http.post(url, null);
+  }
 }

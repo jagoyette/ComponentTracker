@@ -20,11 +20,6 @@ const stravaAthleteSchema = new Schema({
         photos: [{
             value: String
         }]
-    },
-    token: {
-        accessToken: String,
-        expiresAt: Date,
-        refreshToken: String
     }
 });
 

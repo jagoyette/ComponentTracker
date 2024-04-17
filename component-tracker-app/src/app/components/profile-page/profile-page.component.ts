@@ -31,4 +31,10 @@ export class ProfilePageComponent implements OnInit{
       }
     });
   }
+
+  checkStravaIntegration(): void {
+    this.apiService.checkStravaIntegration().subscribe(result => {
+      console.log('Strava Integration Result: ', result);
+    })
+  }
 }

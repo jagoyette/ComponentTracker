@@ -24,8 +24,10 @@
     <button (click)="logout()">Logout</button>
 
     <div>
-        <a href="http://localhost:3000/auth/strava/integrate">
+        <a href="http://localhost:3000/auth/strava/integrate?successRedirect=http://localhost:4200/profile&failureRedirect=http://localhost:4200/profile">
             Integrate Strava
         </a>
+
+        <button (click)="checkStravaIntegration()">Check Strava Integration</button>
     </div>
 </div>  
