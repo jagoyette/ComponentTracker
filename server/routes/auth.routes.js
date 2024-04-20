@@ -1,6 +1,7 @@
 const express = require("express");
 const passport = require("passport");
 const UserController = require('../controllers/user');
+const TokenController = require('../controllers/stravaToken');
 
 const router = express.Router();
 
@@ -28,6 +29,8 @@ router.get('/user',
 
 
 // method to encode redirect urls into a state object
+// Used for OAuth redirect workflows so that application redirects can
+// be passed to our callback URL
 function encodeStateRedirects(req, defaultSuccess, defaultFailure) {
     let { successRedirect, failureRedirect } = req.query || {};
 
@@ -39,6 +42,7 @@ function encodeStateRedirects(req, defaultSuccess, defaultFailure) {
     return JSON.stringify({ successRedirect, failureRedirect });
 }
 
+// Decodes the redirect urls from the state object
 function decodeStateRedirects(req, defaultSuccess, defaultFailure) {
     // initialize defaults for redirects
     let successRedirect = defaultSuccess;
@@ -69,19 +73,10 @@ function decodeStateRedirects(req, defaultSuccess, defaultFailure) {
 // below. From the callback, the user is redirected to the
 // apps success or failure url depending on user authorization.
 router.get('/google/login', (req, res, next) => {
-    // extract redirects and place into passport's state
-    let { successRedirect, failureRedirect } = req.query || {};
-
-    // Make sure redirects have sane defaults
-    successRedirect = successRedirect || '/';
-    failureRedirect = failureRedirect || '/google/login';
-    console.log(`Starting Google login with redirects => success: ${successRedirect}, failure: ${failureRedirect}`);
-
     // Initiate OAuth2 authentication flow
-    const state = JSON.stringify({ successRedirect, failureRedirect });
     passport.authenticate('google', {
         scope: [ 'email', 'profile' ],
-        state: state
+        state: encodeStateRedirects(req, '/', '../google/failure')
     })(req, res, next);
 });
 
@@ -90,24 +85,7 @@ router.get('/google/login', (req, res, next) => {
 // user appropriately
 router.get('/google/callback', (req, res, next) => {
     try {
-        console.log('Google callback entered...');
-
-        // initialize defaults for redirects
-        let successRedirect = '/';
-        let failureRedirect = '/google/login';
-
-        // extract the redirects from state and use it if we have it
-        const { state } = req.query || {};
-        if (state) {
-            // Parse the string to get our object containing urls
-            const redirectUrls = JSON.parse(state);
-            if (redirectUrls?.successRedirect) {
-                successRedirect = redirectUrls.successRedirect;
-            }
-            if (redirectUrls?.failureRedirect) {
-                failureRedirect = redirectUrls.failureRedirect;
-            }
-        }
+        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../google/failure');               
 
         // Let passport authenticate and redirect
         passport.authenticate('google', {
@@ -120,31 +98,12 @@ router.get('/google/callback', (req, res, next) => {
     }
 });
 
-router.get('/strava/integrate0',
-    passport.authenticate('strava', {
-        scope: ['activity:read_all'],
-        session: false
-    })
-);
-
-router.get('/strava/integrate', function (req, res, next) {
-    // extract redirects and place into passport's state
-    let { successRedirect, failureRedirect } = req.query || {};
-
-    // Make sure redirects have sane defaults
-    successRedirect = successRedirect || '/';
-    failureRedirect = failureRedirect || '../strava/failure';
-    console.log(`Starting Strava login with redirects => success: ${successRedirect}, failure: ${failureRedirect}`);
-    
-    const state = JSON.stringify({ successRedirect, failureRedirect });
-
-    // initiate oauth workflow
+router.get('/strava/integrate', (req, res, next) => {
     passport.authenticate('strava', {
         scope: ['activity:read_all'],
         session: false,
-        state: state
+        state: encodeStateRedirects(req, '/', '../strava/failure')
     })(req, res, next);
-    next();
 });
 
 // strava callback url
@@ -152,22 +111,7 @@ router.get('/strava/callback', function (req, res, next) {
     try {
         console.log('Strava callback entered...');
 
-        // initialize defaults for redirects
-        let successRedirect = '/';
-        let failureRedirect = '../strava/failure';
-
-        // extract the redirects from state and use it if we have it
-        const { state } = req.query || {};
-        if (state) {
-            // Parse the string to get our object containing urls
-            const redirectUrls = JSON.parse(state);
-            if (redirectUrls?.successRedirect) {
-                successRedirect = redirectUrls.successRedirect;
-            }
-            if (redirectUrls?.failureRedirect) {
-                failureRedirect = redirectUrls.failureRedirect;
-            }
-        }
+        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../strava/failure');               
         passport.authenticate('strava', {
             session: false,
             successRedirect: successRedirect,
@@ -182,6 +126,19 @@ router.get('/strava/callback', function (req, res, next) {
 router.get('/strava/failure', (req, res) => {
     console.error('Strava integration falied');
     res.send('No dice');
+});
+
+router.post('/strava/refresh', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.status(401).send('Not authenticated');
+        return;
+    }
+
+    const userId = req.user._id;
+    const token = await TokenController.getToken(userId);
+    const newToken = await TokenController.refreshToken(userId, token.refreshToken);
+
+    return res.send(newToken);
 });
 
 // export the router

@@ -11,5 +11,23 @@ const stravaTokenSchema = new Schema({
 
 const StravaToken = mongoose.model('StravaToken', stravaTokenSchema);
 
+// Helper method to update or create a StravaToken entry
+StravaToken.createOrUpdateToken = async function(stravaToken) {
+    // validate profile
+    if (!stravaToken || !stravaToken.userId) {
+        return null;
+    }
+
+    // find and update entry
+    const token = await StravaToken.findOneAndUpdate( 
+        {userId: stravaToken.userId },      // filter
+        stravaToken,                        // update
+        { upsert: true }                    // options - insert if not found
+    );
+    
+    return token;
+}
+
+
 
 module.exports = StravaToken;

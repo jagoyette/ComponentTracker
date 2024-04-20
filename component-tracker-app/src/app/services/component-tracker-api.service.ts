@@ -27,4 +27,9 @@ export class ComponentTrackerApiService {
     const url = this.baseUrl + 'auth/strava/integration'
     return this.http.post(url, null);
   }
+
+  refreshToken(): Observable<any> {
+    const url = this.baseUrl + 'auth/strava/refresh'
+    return this.http.post(url, null);
+  }
 }

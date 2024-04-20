@@ -19,6 +19,13 @@ const getUserByProviderId = async function(provider, id) {
     return !user ? null : new UserDto(user);
 };
 
+// Get a user by userid
+const getUserByUserId = async function(userId) {
+    const user = await UserRepository.findById(userId);
+    return !user ? null : new UserDto(user);
+};
+
 module.exports = {
-    getUserByProviderId
+    getUserByProviderId,
+    getUserByUserId
 }

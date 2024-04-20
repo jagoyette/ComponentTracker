@@ -56,23 +56,23 @@ if (stravaClientID && stravaClientSecret) {
     },
         // Verify user function
         async function(req, accessToken, refreshToken, params, profile, done) {
-            console.log('Success with strava');
+            console.log('Successfully integrated with strava');
             const stravaAthlete = {
                 userId: req.user._id,
-                profile: profile,
+                ...params.athlete
             };            
 
-            // Create the athlete
-            const athleteModel = await StravaAthlete.create(stravaAthlete);
+            // Create the athlete if needes
+            const athleteModel = await StravaAthlete.findOrCreateAthlete(stravaAthlete);
 
-            // Store the access tokens
+            // Store the (updated) access tokens
             const stravaToken = {
                 userId: req.user._id,
                 accessToken,
                 refreshToken,
                 expiresAt: new Date(params.expires_at*1000)
             }
-            const tokenModel = await StravaToken.create(stravaToken);
+            const tokenModel = await StravaToken.createOrUpdateToken(stravaToken);
 
             // Finally return with our profile
             return done(null, profile);
