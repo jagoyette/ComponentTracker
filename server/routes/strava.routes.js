@@ -8,7 +8,7 @@ router.post('/synchronize', (req, res) => {
         res.status(401).send('Unauthenticated');
     }
 
-    StravaController.synchronizeRides(req.user._id).then( v => {
+    StravaController.synchronizeRides(req.user.userId).then( v => {
         console.log('done');
     });
     res.send({'result': 'started'});

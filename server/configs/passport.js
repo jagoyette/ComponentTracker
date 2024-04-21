@@ -6,22 +6,18 @@ const UserRepository = require("../models/user");
 const StravaAthlete = require("../models/strava.athlete");
 const StravaToken = require("../models/strava.token");
 
+const UserController = require("../controllers/user");
+
 passport.serializeUser((user, done) => {
-    // Serialize our user with the unique id assigned
-    // by our DB. Note this is not the same as the user's
-    // profile id.
-    done(null, user);
+    // Serialize using unique userId
+    done(null, user.getUserId());
 });
 
-passport.deserializeUser((user, done) => {
-    // try {
-    //     // Retrieve user using the DB unique ID
-    //     const user = await UserRepository.findById(userUid);
-    //     done(null, user);
-    // } catch (error) {
-    //     done(error);
-    // }
-    done(null, user);
+passport.deserializeUser((userId, done) => {
+    // Retrieve our user from database
+    UserController.getUserByUserId(userId).then(user => {
+        done(null, user);
+    });
 });
 
 // Register Google authentication strategy
@@ -37,7 +33,7 @@ if (googleClientID && googleClientSecret) {
         // Verify user function
         async function(accessToken, refreshToken, profile, done) {
             const user = await UserRepository.findOrCreateUser(profile);
-            return done(null, user?.toObject());
+            return done(null, user);
         }
     ));
 } else {
@@ -57,17 +53,17 @@ if (stravaClientID && stravaClientSecret) {
         // Verify user function
         async function(req, accessToken, refreshToken, params, profile, done) {
             console.log('Successfully integrated with strava');
-            const stravaAthlete = {
-                userId: req.user._id,
-                ...params.athlete
-            };
 
-            // Create the athlete if needes
+            // Get the userId of the current user
+            const userId = req.user?.userId;
+
+            // Create the athlete if needed
+            const stravaAthlete = StravaAthlete.fromAthlete(userId, params.athlete);
             const athleteModel = await StravaAthlete.findOrCreateAthlete(stravaAthlete);
 
             // Store the (updated) access tokens
             const stravaToken = {
-                userId: req.user._id,
+                userId: userId,
                 accessToken,
                 refreshToken,
                 expiresAt: new Date(params.expires_at*1000)

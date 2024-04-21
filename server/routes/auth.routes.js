@@ -134,7 +134,7 @@ router.post('/strava/refresh', async (req, res) => {
         return;
     }
 
-    const userId = req.user._id;
+    const userId = req.user?.userId;
     const token = await TokenController.getToken(userId);
     const newToken = await TokenController.refreshToken(userId, token.refreshToken);
 

@@ -8,18 +8,38 @@ const stravaAthleteSchema = new Schema({
     id: { type: String, required: true },       // Strava athlete Id
     firstname: String,
     lastname: String,
-    profile_medium: String,                     // med profile pic url
+    profileMedium: String,                     // med profile pic url
     profile: String,                            // profile pic url
     city: String,
     state: String,
     country: String,
     sex: String,
     summit: Boolean,
-    created_at: Date,
-    updated_at: Date
+    createdAt: Date,
+    updatedAt: Date
 });
 
 const StravaAthlete = mongoose.model('StravaAthlete', stravaAthleteSchema);
+
+// Creates an instance of a strava athlete matching the schema structure
+// given the userId and result from Strava Athlete API
+StravaAthlete.fromAthlete = function(userId, athlete) {
+    return {
+        userId: userId,
+        id: athlete.id,
+        firstname: athlete.firstname,
+        lastname: athlete.lastname,
+        profileMedium: athlete.profile_medium,
+        profile: athlete.profile,
+        city: athlete.city,
+        state: athlete.state,
+        country: athlete.country,
+        sex: athlete.sex,
+        summit: athlete.summit,
+        createdAt: athlete.created_at,
+        updatedAt: athlete.updated_at
+    };
+}
 
 // Helper method to locate an athlete in database based on supplied profile (passportjs) and userid.
 // A new athlete is added if not found. The athlete is returned on success, null otherwise.
