@@ -15,7 +15,7 @@ class TokenDto {
 }
 
 const getToken = async function (userId) {
-    return new TokenDto(TokenRepository.findOne( {userId: userId}));
+    return new TokenDto(await TokenRepository.findOne( {userId: userId}));
 }
 
 const refreshToken = async function(userId, refreshToken) {
