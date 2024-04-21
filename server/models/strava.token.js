@@ -19,15 +19,24 @@ StravaToken.createOrUpdateToken = async function(stravaToken) {
     }
 
     // find and update entry
-    const token = await StravaToken.findOneAndUpdate( 
+    const token = await StravaToken.findOneAndUpdate(
         {userId: stravaToken.userId },      // filter
         stravaToken,                        // update
         { upsert: true }                    // options - insert if not found
     );
-    
+
     return token;
 }
 
+// Create a token from results of refresh token
+StravaToken.createFromRefreshResult = function(userId, refreshResult) {
+    return refreshResult ?  {
+        userId: userId,
+        accessToken: refreshResult.access_token,
+        expiresAt: new Date(refreshResult.expires_at * 1000),
+        refreshToken: refreshResult.refresh_token
+    } : null;
+}
 
 
 module.exports = StravaToken;

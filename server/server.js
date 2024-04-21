@@ -21,3 +21,11 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+// start a job that refreshes strava tokens
+const TokenController = require('./controllers/stravaToken');
+const cron = require("node-cron");
+cron.schedule('* * 1 * * *', () => {
+    console.log('Strava Token Refresh Checker starting at ' + new Date());
+    TokenController.refreshExpiringUserTokens();
+});

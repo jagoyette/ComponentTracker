@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// The Strava Athlete scheme stores information about the athlete and 
+// The Strava Athlete scheme stores information about the athlete and
 // access tokens required to access the athlete's data
 const stravaAthleteSchema = new Schema({
     userId: { type: String, required: true },   // link to User schema
@@ -32,7 +32,7 @@ StravaAthlete.findOrCreateAthlete = async function(stravaAthlete) {
     // look for match in database and update it
     var athlete = await this.findOneAndUpdate({
          userId: stravaAthlete.userId
-        }, 
+        },
         stravaAthlete, {
             upsert: true        // create if not found
         }).exec();

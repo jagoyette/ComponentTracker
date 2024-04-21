@@ -19,7 +19,7 @@ passport.deserializeUser((user, done) => {
     //     const user = await UserRepository.findById(userUid);
     //     done(null, user);
     // } catch (error) {
-    //     done(error); 
+    //     done(error);
     // }
     done(null, user);
 });
@@ -60,7 +60,7 @@ if (stravaClientID && stravaClientSecret) {
             const stravaAthlete = {
                 userId: req.user._id,
                 ...params.athlete
-            };            
+            };
 
             // Create the athlete if needes
             const athleteModel = await StravaAthlete.findOrCreateAthlete(stravaAthlete);

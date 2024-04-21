@@ -85,7 +85,7 @@ router.get('/google/login', (req, res, next) => {
 // user appropriately
 router.get('/google/callback', (req, res, next) => {
     try {
-        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../google/failure');               
+        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../google/failure');
 
         // Let passport authenticate and redirect
         passport.authenticate('google', {
@@ -111,7 +111,7 @@ router.get('/strava/callback', function (req, res, next) {
     try {
         console.log('Strava callback entered...');
 
-        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../strava/failure');               
+        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../strava/failure');
         passport.authenticate('strava', {
             session: false,
             successRedirect: successRedirect,

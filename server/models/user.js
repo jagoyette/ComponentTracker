@@ -29,7 +29,7 @@ User.findUserByProviderId = async function(provider, id) {
     }
 
     // look for match in database
-    return await this.findOne({ id: id, provider: provider }).exec();    
+    return await this.findOne({ id: id, provider: provider }).exec();
 }
 
 // Helper method to locate a user in database based on supplied profile (passportjs).
