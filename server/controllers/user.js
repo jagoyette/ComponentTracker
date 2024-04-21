@@ -3,6 +3,7 @@ const UserRepository = require('../models/user');
 // Our DTO (Data Transfer Object) for users
 class UserDto {
     constructor(user) {
+        this.userId = user.getUserId() || user._id;
         this.id = user.id;
         this.provider = user.provider;
         this.name = user.displayName;

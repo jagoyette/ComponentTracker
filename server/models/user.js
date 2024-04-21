@@ -21,8 +21,15 @@ const userSchema = new Schema({
     }]
 });
 
+// Instance method to retrieve the userId used to link other collections
+userSchema.methods.getUserId = function() {
+    return this?._id?.toString();
+};
+
+// Our User data model
 const User = mongoose.model('User', userSchema);
 
+// Locate a user in the database for the given provider and id
 User.findUserByProviderId = async function(provider, id) {
     if (!id) {
         return null;

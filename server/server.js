@@ -16,6 +16,9 @@ app.use(passport.session());
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
+const stravaRoutes = require('./routes/strava.routes');
+app.use('/strava', stravaRoutes);
+
 // Run the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

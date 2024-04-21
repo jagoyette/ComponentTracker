@@ -32,4 +32,9 @@ export class ComponentTrackerApiService {
     const url = this.baseUrl + 'auth/strava/refresh'
     return this.http.post(url, null);
   }
+
+  synchronizeStravaRides(): Observable<any> {
+    const url = this.baseUrl + 'strava/synchronize'
+    return this.http.post(url, null);
+  }
 }

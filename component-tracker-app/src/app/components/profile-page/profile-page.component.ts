@@ -53,4 +53,10 @@ export class ProfilePageComponent implements OnInit{
       console.log('Refresh Result: ', result);
     }) 
   }
+
+  syncronizeStravaRides() : void {
+    this.apiService.synchronizeStravaRides().subscribe(result => {
+      console.log('Sync results: ', result);
+    });
+  }
 }
