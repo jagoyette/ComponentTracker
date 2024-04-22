@@ -20,19 +20,21 @@
         <input id="provider" name="provider" readonly disabled type="text" value="{{user?.provider}}" />
     </form>
 
-    <br>
-    <button (click)="logout()">Logout</button>
+    <p>
+        <button (click)="logout()">Logout</button>
+    </p>
 
-    <div>
+    <!-- Show a link to integrate Strava if not interated yet -->
+    <div [hidden]="stravaUser">
         <a href="{{stravaIntegrationUrl}}">Integrate Strava</a>
     </div>
-    <div>
-        <button (click)="checkStravaIntegration()">Check Strava Integration</button>
-    </div>
-    <div>
-        <button (click)="refreshMyToken()">Refresh Token</button>
-    </div>
-    <div>
+
+    <div [hidden]="!stravaUser">
+        <div>Total Rides: {{ stravaStats?.totalRides }}</div>
+        <div>Total Distance: {{ stravaStats?.totalDistance }}</div>
+        <div>Total Time: {{ stravaStats?.totalTime }}</div>
+
+        <br>
         <button (click)="syncronizeStravaRides()">Sync Strava Rides</button>
     </div>
 </div>  

@@ -16,6 +16,8 @@ export class ProfilePageComponent implements OnInit{
   constructor (private apiService: ComponentTrackerApiService) {}
 
   public user: User | null = null;
+  public stravaUser: any | null = null;
+  public stravaStats: any | null = null;
   public stravaIntegrationUrl: String | null = null;
 
   ngOnInit(): void {
@@ -25,11 +27,21 @@ export class ProfilePageComponent implements OnInit{
       console.log('Current user', this.user);
     });
 
+    // Check for current strava user
+    this.apiService.getStravaAthlete().subscribe(data => {
+      this.stravaUser = data;
+      console.log('Strava User', this.stravaUser);
+      // Get user's stats
+      this.updateStravaStats();
+    }, err => {
+      console.log('No Strava Integration');
+    });
+ 
     // Build the strava integration url
     const origin = window.location.origin;
 
     // Add success and failure redirects to the url
-    const successUrl = `${origin}/strava/success`;
+    const successUrl = `${origin}/profile`;
     const failureUrl = `${origin}/strava/failure`;
     this.stravaIntegrationUrl = `${environment.API_SERVER_URL}auth/strava/integrate?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
   }
@@ -42,16 +54,11 @@ export class ProfilePageComponent implements OnInit{
     });
   }
 
-  checkStravaIntegration(): void {
-    this.apiService.checkStravaIntegration().subscribe(result => {
-      console.log('Strava Integration Result: ', result);
-    })
-  }
-
-  refreshMyToken() : void {
-    this.apiService.refreshToken().subscribe(result => {
-      console.log('Refresh Result: ', result);
-    }) 
+  updateStravaStats(): void {
+    this.apiService.getStravaStats().subscribe(data => {
+      this.stravaStats = data;
+      console.log(data);
+    });
   }
 
   syncronizeStravaRides() : void {

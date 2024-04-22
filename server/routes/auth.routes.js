@@ -7,12 +7,11 @@ const router = express.Router();
 
 // Logout user
 router.post('/logout', function (req, res, next) {
-    req.logOut(function (err) {
-        if (err) { return next(err); }
-        res.send({
-            success: true,
-            message: "User logged out"
-        });
+    req.logout();
+    req.session?.destroy();
+    res.send({
+        success: true,
+        message: "User logged out"
     });
 });
 

@@ -23,14 +23,14 @@ export class ComponentTrackerApiService {
     return this.http.post(url, null);
   }
 
-  checkStravaIntegration(): Observable<any> {
-    const url = this.baseUrl + 'auth/strava/integration'
-    return this.http.post(url, null);
+  getStravaAthlete(): Observable<any> {
+    const url = this.baseUrl + 'strava/athlete'
+    return this.http.get(url);
   }
 
-  refreshToken(): Observable<any> {
-    const url = this.baseUrl + 'auth/strava/refresh'
-    return this.http.post(url, null);
+  getStravaStats(): Observable<any> {
+    const url = this.baseUrl + 'strava/statistics'
+    return this.http.get(url);
   }
 
   synchronizeStravaRides(): Observable<any> {
