@@ -98,6 +98,14 @@ router.get('/google/callback', (req, res, next) => {
     }
 });
 
+router.get('/google/failure', (req, res) => {
+    console.error('Google login falied');
+    res.send('No dice');
+});
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// Strava Integration
+/////////////////////////////////////////////////////////////////////////////////////////
 router.get('/strava/integrate', (req, res, next) => {
     passport.authenticate('strava', {
         scope: ['activity:read_all'],
@@ -126,19 +134,6 @@ router.get('/strava/callback', function (req, res, next) {
 router.get('/strava/failure', (req, res) => {
     console.error('Strava integration falied');
     res.send('No dice');
-});
-
-router.post('/strava/refresh', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).send('Not authenticated');
-        return;
-    }
-
-    const userId = req.user?.userId;
-    const token = await TokenController.getToken(userId);
-    const newToken = await TokenController.refreshToken(userId, token.refreshToken);
-
-    return res.send(newToken);
 });
 
 // export the router

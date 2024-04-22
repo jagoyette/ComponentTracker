@@ -31,4 +31,7 @@ const cron = require("node-cron");
 cron.schedule('* * 1 * * *', () => {
     console.log('Strava Token Refresh Checker starting at ' + new Date());
     TokenController.refreshExpiringUserTokens();
+}, {
+    // Start executing job immediately
+    runOnInit: true
 });

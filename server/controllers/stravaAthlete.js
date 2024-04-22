@@ -1,4 +1,3 @@
-const { before, after } = require('node:test');
 const AthleteRepository = require('../models/strava.athlete');
 const TokenController = require('./stravaToken');
 const Ride = require('../models/ride');
@@ -29,6 +28,28 @@ const getAthleteByUserId = async function(userId) {
     return !athlete ? null : new StravaAthleteDto(athlete);
 };
 
+// Retrieve cummulative statistics for an athlete's rides
+const getAthleteStats = async function(userId) {
+    // Use aggregate function to get cummulative rider stats
+    const athleteStats = await Ride.aggregate([
+        { $match: { userId: userId} },
+        { $group: {
+            _id: null,
+            totalRides: { $sum: 1 },
+            totalDistance: { $sum: "$distance" },
+            totalTime: { $sum: "$movingTime" }
+        }},
+        { $project: {
+            _id: 0,
+            totalRides: 1,
+            totalDistance: 1,
+            totalTime: 1
+        }}
+    ]);
+
+    return athleteStats.at(0);
+};
+
 // Retrieves ride data from Strava and updates user rides
 const synchronizeRides = async function(userId) {
     // retrieve the athlete
@@ -46,7 +67,7 @@ const synchronizeRides = async function(userId) {
     const url = 'https://www.strava.com/api/v3/athlete/activities';
 
     // loop over every year
-    const dateStart = athlete.created_at;
+    const dateStart = athlete.createdAt || new Date();
     const yearStart = dateStart.getFullYear();
     const yearNow = new Date().getFullYear();
     let numRides = 0;
@@ -106,5 +127,6 @@ const synchronizeRides = async function(userId) {
 
 module.exports = {
     getAthleteByUserId,
+    getAthleteStats,
     synchronizeRides
 }
