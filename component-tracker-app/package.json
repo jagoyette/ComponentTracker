@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "publish": "node -e \"require('fs').cpSync('dist/component-tracker-app/browser/', '../server/public/', {recursive: true});\""
   },
   "private": true,
   "dependencies": {

@@ -23,4 +23,7 @@ app.use(session({
     saveUninitialized: true
 }));
 
+// Serve static files (client web app)
+app.use('/', express.static('public'));
+
 module.exports = app;
