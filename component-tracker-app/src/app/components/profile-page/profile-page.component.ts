@@ -3,11 +3,12 @@ import { ComponentTrackerApiService } from '../../services/component-tracker-api
 import { User } from '../../models/user';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.css'
 })

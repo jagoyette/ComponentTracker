@@ -3,7 +3,7 @@
 <div [hidden]="user">
     <!-- show login button when not logged in -->
     <p>You must be logged in to view your profile</p>
-    <a href="/login"><button>Login</button></a>
+    <a routerLink="/login"><button>Login</button></a>
 </div>
 
 <div [hidden]="!user">

@@ -9,7 +9,9 @@ import { User } from '../models/user';
 })
 export class ComponentTrackerApiService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    console.log('Api Service Url: ' + this.baseUrl);
+   }
 
   private readonly baseUrl = environment.API_SERVER_URL || '/';
 
