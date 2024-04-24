@@ -28,7 +28,7 @@ app.listen(port, () => {
 // start a job that refreshes strava tokens
 const TokenController = require('./controllers/stravaToken');
 const cron = require("node-cron");
-cron.schedule('* * 1 * * *', () => {
+cron.schedule('0 0 1 * * *', () => {
     console.log('Strava Token Refresh Checker starting at ' + new Date());
     TokenController.refreshExpiringUserTokens();
 }, {
