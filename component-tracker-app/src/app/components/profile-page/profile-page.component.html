@@ -1,0 +1,40 @@
+<h3>Profile</h3>
+
+<div [hidden]="user">
+    <!-- show login button when not logged in -->
+    <p>You must be logged in to view your profile</p>
+    <a href="/login"><button>Login</button></a>
+</div>
+
+<div [hidden]="!user">
+    <p>This is your profile</p>
+
+    <form>
+        <label for="name">Name:</label>
+        <input id="name" name="name" readonly disabled type="text" value="{{user?.name}}" />
+        <br><br>
+        <label for="email">Email:</label>
+        <input id="email" name="email" readonly disabled type="text" value="{{user?.email}}" />
+        <br><br>
+        <label for="provider">Provider:</label>
+        <input id="provider" name="provider" readonly disabled type="text" value="{{user?.provider}}" />
+    </form>
+
+    <p>
+        <button (click)="logout()">Logout</button>
+    </p>
+
+    <!-- Show a link to integrate Strava if not interated yet -->
+    <div [hidden]="stravaUser">
+        <a href="{{stravaIntegrationUrl}}">Integrate Strava</a>
+    </div>
+
+    <div [hidden]="!stravaUser">
+        <div>Total Rides: {{ stravaStats?.totalRides }}</div>
+        <div>Total Distance: {{ stravaStats?.totalDistance }}</div>
+        <div>Total Time: {{ stravaStats?.totalTime }}</div>
+
+        <br>
+        <button (click)="syncronizeStravaRides()">Sync Strava Rides</button>
+    </div>
+</div>  

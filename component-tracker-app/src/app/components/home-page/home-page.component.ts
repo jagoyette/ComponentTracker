@@ -22,12 +22,4 @@ export class HomePageComponent implements OnInit {
       console.log('Current user', this.user);
     });
   }
-
-  logout(): void {
-    this.apiService.logout().subscribe(result => {
-      if (result?.success) {
-        this.user = null;
-      }
-    });
-  }
 }

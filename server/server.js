@@ -1,49 +1,37 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const passport = require("passport");
-const session = require("express-session");
-const cors = require("cors")
-
-// Read .env file
+// Read .env file before any other module
 require("dotenv").config();
 
-// Connect to database
-const CONNECTION_STRING = process.env.CONNECTION_STRING || 
-                        'mongodb://localhost:27017/component-tracker';
-mongoose.connect(CONNECTION_STRING)
-    .then(console.log("Connected to database successfully."))
-    .catch(err => console.log(err.reason));
+// Configure database
+const mongoose = require("./configs/mongoose");
 
-// Create server app
-const app = express();
-app.use(express.json());
-
-// Enable CORS
-const origins = process.env.CORS_ORIGINS?.split(';');
-if (origins) {
-    console.log('Setting CORS to ', origins);
-    app.use(cors({
-        origin: origins,
-        credentials: true
-    }));
-}
-
-// Install session middleware
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true
-}));
+// Configure Express app
+const app = require("./configs/express");
 
 // Initialize passport authentication
-require('./passport');
+const passport = require('./configs/passport');
 app.use(passport.initialize()); 
 app.use(passport.session()); 
 
+// Setup routes
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
+const stravaRoutes = require('./routes/strava.routes');
+app.use('/strava', stravaRoutes);
+
+// Run the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+});
+
+// start a job that refreshes strava tokens
+const TokenController = require('./controllers/stravaToken');
+const cron = require("node-cron");
+cron.schedule('* * 1 * * *', () => {
+    console.log('Strava Token Refresh Checker starting at ' + new Date());
+    TokenController.refreshExpiringUserTokens();
+}, {
+    // Start executing job immediately
+    runOnInit: true
 });

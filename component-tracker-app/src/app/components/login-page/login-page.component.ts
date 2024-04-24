@@ -17,6 +17,10 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {
     // Build the login url
     const origin = window.location.origin;
-    this.loginUrl = `${environment.API_SERVER_URL}auth/google/login?returnTo=${origin}/home`;
+
+    // Add success and failure redirects to the login url
+    const successUrl = `${origin}/home`;
+    const failureUrl = `${origin}/login`;
+    this.loginUrl = `${environment.API_SERVER_URL}auth/google/login?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
   }
 }

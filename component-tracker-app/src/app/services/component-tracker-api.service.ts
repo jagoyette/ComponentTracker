@@ -22,4 +22,19 @@ export class ComponentTrackerApiService {
     const url = this.baseUrl + 'auth/logout'
     return this.http.post(url, null);
   }
+
+  getStravaAthlete(): Observable<any> {
+    const url = this.baseUrl + 'strava/athlete'
+    return this.http.get(url);
+  }
+
+  getStravaStats(): Observable<any> {
+    const url = this.baseUrl + 'strava/statistics'
+    return this.http.get(url);
+  }
+
+  synchronizeStravaRides(): Observable<any> {
+    const url = this.baseUrl + 'strava/synchronize'
+    return this.http.post(url, null);
+  }
 }
