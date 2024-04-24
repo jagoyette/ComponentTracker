@@ -19,6 +19,12 @@ app.use('/auth', authRoutes);
 const stravaRoutes = require('./routes/strava.routes');
 app.use('/strava', stravaRoutes);
 
+// Serve the Angular app from our 'public' folder
+const express = require('express');
+const path = require('path');
+const publicPath = path.join(__dirname, 'public')
+app.use('/*', express.static(publicPath))
+
 // Run the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

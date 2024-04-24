@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ComponentTrackerApiService } from '../../services/component-tracker-api.service';
 import { User } from '../../models/user';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
 })
