@@ -81,7 +81,7 @@ $ node ./server.js
 The client is an Angular project. You can use the standard command `ng serve` to run the development server that automatically saves and redeploys updates. Open a terminal and change to the `component-tracker-app` directory and execute the following:
 
 ```
-$ npm run serve
+$ npm run start
 ```
 
 > Note: You can also use `ng serve` directly if you have previously installed the Angular CLI tool.
