@@ -25,9 +25,12 @@
     </p>
 
     <!-- Show a link to integrate Strava if not interated yet -->
-    <div [hidden]="stravaUser">
-        <a href="{{stravaIntegrationUrl}}">Integrate Strava</a>
-    </div>
+        <div [hidden]="stravaUser">
+            <a href="{{stravaIntegrationUrl}}"><button>Integrate Strava</button></a>
+        </div>
+        <div [hidden]="!stravaUser">
+            <button (click)="disconnectStrava()">Disconnect Strava</button>
+        </div>
 
     <div [hidden]="!stravaUser">
         <div>Total Rides: {{ stravaStats?.totalRides }}</div>

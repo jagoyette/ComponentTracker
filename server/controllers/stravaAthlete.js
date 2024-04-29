@@ -50,6 +50,10 @@ const getAthleteStats = async function(userId) {
     return athleteStats.at(0);
 };
 
+const deleteAthlete = async function(userId) {
+    await AthleteRepository.deleteOne( {userId: userId})
+};
+
 // Retrieves ride data from Strava and updates user rides
 const synchronizeRides = async function(userId) {
     // retrieve the athlete
@@ -128,5 +132,6 @@ const synchronizeRides = async function(userId) {
 module.exports = {
     getAthleteByUserId,
     getAthleteStats,
+    deleteAthlete,
     synchronizeRides
 }

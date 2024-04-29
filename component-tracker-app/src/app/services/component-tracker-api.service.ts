@@ -30,6 +30,11 @@ export class ComponentTrackerApiService {
     return this.http.get(url);
   }
 
+ deleteStravaAthlete(): Observable<any> {
+    const url = this.baseUrl + 'strava/athlete'
+    return this.http.delete(url);
+  }
+
   getStravaStats(): Observable<any> {
     const url = this.baseUrl + 'strava/statistics'
     return this.http.get(url);

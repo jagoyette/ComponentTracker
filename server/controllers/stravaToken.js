@@ -18,6 +18,10 @@ const getToken = async function (userId) {
     return new TokenDto(await TokenRepository.findOne( {userId: userId}));
 }
 
+const deleteToken = async function (userId) {
+    const result = await TokenRepository.remove({userId: userId});
+}
+
 const refreshToken = async function(userId, refreshToken) {
     try {
         const result = await axios.post(refreshUrl, {
@@ -66,6 +70,7 @@ const refreshExpiringUserTokens = async function() {
 
 module.exports = {
     getToken,
+    deleteToken,
     refreshToken,
     refreshExpiringUserTokens
 }
