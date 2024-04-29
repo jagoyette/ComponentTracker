@@ -22,7 +22,10 @@ StravaToken.createOrUpdateToken = async function(stravaToken) {
     const token = await StravaToken.findOneAndUpdate(
         {userId: stravaToken.userId },      // filter
         stravaToken,                        // update
-        { upsert: true }                    // options - insert if not found
+        { 
+            upsert: true,                   // options - insert if not found
+            new: true,                      // return new / modified doc
+         }                    
     );
 
     return token;

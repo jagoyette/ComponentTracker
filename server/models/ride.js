@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const rideSchema = new Schema({
     userId: { type: String, required: true },       // Link to User Schema
     provider: { type: String, required: true },     // Strava, Manual, etc...
-    rideId: {type: String, required: true },        // Unique Id for this ride
+    rideId: {type: String, required: true},         // Unique Id for this ride
     athleteId: String,                              // Id of athlete on provider platform
     gearId: String,                                 // Id of bike gear used    
     externalId: String,                             // An optional external Id                          

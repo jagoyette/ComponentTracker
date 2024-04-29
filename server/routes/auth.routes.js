@@ -156,7 +156,7 @@ router.get('/strava/callback', async function (req, res, next) {
             });
 
             // extract token and athlete data
-            const { athlete, accessToken, refreshToken, expires_at } = result.data;
+            const { athlete, access_token, refresh_token, expires_at } = result.data;
 
             // Get the userId of the current user
             const userId = req.user?.userId;
@@ -174,8 +174,8 @@ router.get('/strava/callback', async function (req, res, next) {
             // Store the access token
             const stravaToken = {
                 userId: userId,
-                accessToken,
-                refreshToken,
+                accessToken: access_token,
+                refreshToken: refresh_token,
                 expiresAt: new Date(expires_at*1000)
             }
             const tokenModel = await StravaToken.createOrUpdateToken(stravaToken);

@@ -58,6 +58,8 @@ export class ProfilePageComponent implements OnInit{
   disconnectStrava(): void {
     this.apiService.deleteStravaAthlete().subscribe(result => {
       console.log(result);
+      this.stravaUser = null;
+      this.stravaStats = null;
     })
   };
 

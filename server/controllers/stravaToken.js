@@ -15,11 +15,19 @@ class TokenDto {
 }
 
 const getToken = async function (userId) {
-    return new TokenDto(await TokenRepository.findOne( {userId: userId}));
+    try {
+        return new TokenDto(await TokenRepository.findOne( {userId: userId}));   
+    } catch (error) {
+        console.log('Error retrieving token', error);        
+    }
 }
 
 const deleteToken = async function (userId) {
-    const result = await TokenRepository.remove({userId: userId});
+    try {
+        const result = await TokenRepository.deleteMany({userId: userId});
+    } catch (error) {
+        console.log('Error deleting token', error);              
+    }
 }
 
 const refreshToken = async function(userId, refreshToken) {
