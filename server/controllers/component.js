@@ -78,7 +78,13 @@ const updateComponent = async function(userId, componentId, componentDto) {
             componentDto, {
                 new: true
             });
-        return !componentModel ? null : new ComponentDto(componentModel);
+
+        if (!componentModel) {
+            return null;
+        }
+
+        // Sync component with rides
+        return await synchronizeComponentRides(userId, componentModel.id);
     } catch (error) {
         console.log('Error updating component', error);
         return null;
@@ -90,7 +96,12 @@ const createComponent = async function(userId, componentDto) {
          // insert userId
         componentDto.userId = userId;
         const componentModel = await ComponentModel.create(componentDto);
-        return !componentModel ? null : new ComponentDto(componentModel);
+        if (!componentModel) {
+            return null;
+        }
+
+        // Sync new component with rides
+        return await synchronizeComponentRides(userId, componentModel.id);
     } catch (error) {
         console.log('Error creating component', error);
         return null;
