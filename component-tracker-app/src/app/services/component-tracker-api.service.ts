@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
+import { ComponentModel } from '../models/component-model';
 
 @Injectable({
   providedIn: 'root'
@@ -43,5 +44,40 @@ export class ComponentTrackerApiService {
   synchronizeStravaRides(): Observable<any> {
     const url = this.baseUrl + 'strava/synchronize'
     return this.http.post(url, null);
+  }
+
+  /*******************************************************************
+   * Component API
+   * 
+   */
+
+  getMyComponents(): Observable<ComponentModel[]> {
+    const url = this.baseUrl + 'component';
+    return this.http.get<ComponentModel[]>(url);
+  }
+
+  createComponent(componentData: any): Observable<ComponentModel> {
+    const url = this.baseUrl + 'component';
+    return this.http.post<ComponentModel>(url, componentData);
+  }
+
+  getComponent(componentId: String): Observable<ComponentModel> {
+    const url = this.baseUrl + 'component/' + componentId;
+    return this.http.get<ComponentModel>(url);
+  }
+
+  deleteComponent(componentId: String): Observable<ComponentModel> {
+    const url = this.baseUrl + 'component/' + componentId;
+    return this.http.delete<ComponentModel>(url);
+  }
+
+  updateComponent(componentId: String, componentData: any): Observable<ComponentModel> {
+    const url = this.baseUrl + 'component/' + componentId;
+    return this.http.put<ComponentModel>(url, componentData);
+  }
+
+  synchronizeComponentRides(componentId: String): Observable<ComponentModel> {
+    const url = this.baseUrl + 'component/' + componentId + '/sync';
+    return this.http.post<ComponentModel>(url, null);
   }
 }

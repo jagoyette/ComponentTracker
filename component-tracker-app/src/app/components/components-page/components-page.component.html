@@ -1,0 +1,11 @@
+<h3>My Components</h3>
+
+<ul style="height: 120px; overflow: scroll;">
+    <li *ngFor="let component of myComponents">
+        <span>{{component.name}}</span>
+        <button (click)="onSelect(component)">Select</button>
+        <button (click)="onDelete(component)">Delete</button>
+    </li>    
+</ul>
+
+<app-component-detail [hidden]="!selectedComponent" [component]="selectedComponent"></app-component-detail>
