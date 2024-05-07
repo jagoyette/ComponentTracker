@@ -8,4 +8,41 @@
     </li>    
 </ul>
 
-<app-component-detail [hidden]="!selectedComponent" [component]="selectedComponent"></app-component-detail>
+<button (click)="onAddComponent()">Add New Component</button>
+<div *ngIf="newComponent && !selectedComponent">
+    <div>Create a new component</div>
+    <div>
+        <label for="category">Category: </label>
+        <input id="category" [(ngModel)]="newComponent.category" placeholder="category">
+    </div>
+    <div>
+        <label for="name">Name: </label>
+        <input id="name" [(ngModel)]="newComponent.name" placeholder="name">
+    </div>
+    <div>
+        <label for="description">description: </label>
+        <input id="description" [(ngModel)]="newComponent.description" placeholder="description">
+    </div>
+    <div>
+        <label for="manufacturer">manufacturer: </label>
+        <input id="manufacturer" [(ngModel)]="newComponent.manufacturer" placeholder="manufacturer">
+    </div>
+    <div>
+        <label for="model">model: </label>
+        <input id="model" [(ngModel)]="newComponent.model" placeholder="model">
+    </div>
+    <div>
+        <label for="installDate">installDate: </label>
+        <input id="installDate" [(ngModel)]="newComponent.installDate" placeholder="installDate">
+    </div>
+    <div>
+        <label for="retireDate">retireDate: </label>
+        <input id="retireDate" [(ngModel)]="newComponent.retireDate" placeholder="retireDate">
+    </div>
+
+    <button type="submit" (click)="onAdd(newComponent)">Submit</button>
+</div>
+
+<div *ngIf="selectedComponent">
+    <app-component-detail [component]="selectedComponent"></app-component-detail>
+</div>
