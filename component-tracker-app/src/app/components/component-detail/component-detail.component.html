@@ -1,4 +1,5 @@
 <div *ngIf="component">
+    <br>
     <div><b>{{component.name}}</b></div>
     <table>
         <tr>
@@ -43,19 +44,15 @@
         </tr>
     </table>
 
-    <ul style="height: 120px; overflow: scroll;">
-        <li *ngFor="let event of component.eventHistory">
-            <span>
-                {{event.eventType}}
-                |
-                {{event.eventDate}}
-                |
-                {{event.description}}
-                |
-                {{event.distance}}m
-                |
-                {{event.time}}s
-            </span>
-        </li>    
-    </ul>
+    <br>
+    <div>
+        <b>Event History</b>
+        <ul>
+            <li *ngFor="let event of component.eventHistory">
+                <span>
+                    {{event.eventType}} | {{event.eventDate | date:"short"}} | {{event.distance}}m | {{event.time}}s
+                </span>
+            </li>    
+        </ul>
+    </div>
  </div>

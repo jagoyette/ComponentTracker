@@ -166,4 +166,78 @@ router.post('/:componentId/sync', isAuthenticated, async (req, res) => {
     }
 });
 
+// Add a service interval to a component
+router.post('/:componentId/service', isAuthenticated, async (req, res) => {
+    const userId = req.user.userId;
+    const { componentId } = req.params;
+    const componentService = new ComponentController.ComponentServiceDto(req.body);
+
+    const service = await ComponentController.addComponentService(userId, componentId, componentService);
+    if (!service) {
+        res.status(404).send({
+            error: {
+                status: 'Not Found',
+                message: 'No component with Id: ' + componentId + ' was found.'
+            }
+        });        
+    } else {
+        res.send(service);
+    }
+});
+
+// Retrieves a service interval from component
+router.get('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
+    const userId = req.user.userId;
+    const { componentId, componentServiceId } = req.params;
+
+    const service = await ComponentController.getComponentService(userId, componentId, componentServiceId);
+    if (!service) {
+        res.status(404).send({
+            error: {
+                status: 'Not Found',
+                message: 'No component service interval with Id: ' + componentServiceId + ' was found.'
+            }
+        });        
+    } else {
+        res.send(service);
+    }
+});
+
+// Updates a service interval from component
+router.put('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
+    const userId = req.user.userId;
+    const { componentId, componentServiceId } = req.params;
+    const serviceDto = new ComponentController.ComponentServiceDto(req.body);
+
+    const service = await ComponentController.updateComponentService(userId, componentId, componentServiceId, serviceDto);
+    if (!service) {
+        res.status(404).send({
+            error: {
+                status: 'Not Found',
+                message: 'No component service interval with Id: ' + componentServiceId + ' was found.'
+            }
+        });        
+    } else {
+        res.send(service);
+    }
+});
+
+// Remove a service interval from component
+router.delete('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
+    const userId = req.user.userId;
+    const { componentId, componentServiceId } = req.params;
+
+    const service = await ComponentController.removeComponentService(userId, componentId, componentServiceId);
+    if (!service) {
+        res.status(404).send({
+            error: {
+                status: 'Not Found',
+                message: 'No component service interval with Id: ' + componentServiceId + ' was found.'
+            }
+        });        
+    } else {
+        res.send(service);
+    }
+});
+
 module.exports = router;
