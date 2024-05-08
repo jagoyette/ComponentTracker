@@ -7,10 +7,11 @@ export class ComponentModel {
     description: string | undefined;
     manufacturer: string | undefined;
     model: string | undefined;
-    isActive: boolean | undefined;
+    isInstalled: boolean | undefined;
     installDate: Date | undefined;
-    retireDate: Date | undefined;
-    history: any[] | undefined;
+    uninstallDate: Date | undefined;
+    eventHistory: any[] | undefined;
+    serviceIntervals: any[] | undefined;
 
     totalDistance: Number = 0;
     totalTime: Number = 0;

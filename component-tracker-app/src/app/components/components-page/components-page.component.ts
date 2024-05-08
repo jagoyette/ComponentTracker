@@ -53,7 +53,7 @@ export class ComponentsPageComponent implements OnInit {
   onAddComponent(): void {
     this.newComponent = new ComponentModel();
     this.newComponent.installDate = new Date();
-    this.newComponent.isActive = true;
+    this.newComponent.isInstalled = true;
 
     this.selectedComponent = undefined;
   }

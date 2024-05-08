@@ -22,8 +22,8 @@
             <td>{{component.model}}</td>
         </tr>
         <tr>
-            <td>Active?</td>
-            <td>{{component.isActive}}</td>
+            <td>Installed?</td>
+            <td>{{component.isInstalled}}</td>
         </tr>
         <tr>
             <td>Install Date</td>
@@ -31,15 +31,31 @@
         </tr>
         <tr>
             <td>Retire Date</td>
-            <td>{{component.retireDate}}</td>
+            <td>{{component.uninstallDate}}</td>
         </tr>
         <tr>
-            <td>Distance (m)</td>
+            <td>Total Distance (m)</td>
             <td>{{component.totalDistance}}</td>
         </tr>
         <tr>
-            <td>Time (s)</td>
+            <td>Total Time (s)</td>
             <td>{{component.totalTime}}</td>
         </tr>
     </table>
+
+    <ul style="height: 120px; overflow: scroll;">
+        <li *ngFor="let event of component.eventHistory">
+            <span>
+                {{event.eventType}}
+                |
+                {{event.eventDate}}
+                |
+                {{event.description}}
+                |
+                {{event.distance}}m
+                |
+                {{event.time}}s
+            </span>
+        </li>    
+    </ul>
  </div>

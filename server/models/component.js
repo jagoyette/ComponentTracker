@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 // The ComponentEvent schema stores information about an event affecting
 // an individual component. For example, a ride is an event that adds
 // mileage and time to the component's lifetime
-const componentEvent = new Schema({
+const componentEventSchema = new Schema({
     eventType: {            // Type of event
         type: String,
         enum: [
@@ -26,6 +26,14 @@ const componentEvent = new Schema({
     time: Number,           // total time of component usage in seconds
 });
 
+const componentServiceSchema = new Schema({
+    name: { type: String, required: true },     // A name for this service recommendation
+    distance: Number,                           // Min distance to trigger service in meters
+    time: Number,                               // Min number of seconds to trigger service
+    rides: Number,                              // Min number of rides to trigger service
+    description: String,                        // Description of service action
+});
+
 // The Component schema stores information about a specific bike component
 const componentSchema = new Schema({
     userId: { type: String, required: true },   // link to User schema
@@ -35,10 +43,11 @@ const componentSchema = new Schema({
     manufacturer: String,                       // manufacturer of component
     model: String,                              // the manufacturer's model name
 
-    isActive: Boolean,                          // flag indicating if component is currently installed
+    isInstalled: Boolean,                          // flag indicating if component is currently installed
     installDate: {type: Date, default: Date.now }, // timestamp of time component was installed UTC
-    retireDate: { type: Date},                     // timestamp of time component was retired UTC
-    history: [componentEvent]                   // history of events impacting this component
+    uninstallDate: { type: Date},               // timestamp of time component was uninstalled UTC
+    eventHistory: [componentEventSchema],       // history of events (rides) impacting this component
+    serviceIntervals: [componentServiceSchema], // list of recommended service intervals
 });
 
 const Component = mongoose.model('Component', componentSchema);

@@ -14,7 +14,18 @@ class ComponentEventDto {
         this.distance = model.distance ?? 0,
         this.time = model.time ?? 0
     }
-}
+};
+
+class ComponentServiceDto {
+    constructor(model) {
+        this.name = model.name;
+        this.distance = model.distance;
+        this.time = model.time;
+        this.rides = model.rides;
+        this.description = model.description;
+    }
+};
+
 class ComponentDto {
     constructor(model) {
         // required fields
@@ -26,17 +37,19 @@ class ComponentDto {
         this.description = model.description;
         this.manufacturer = model.manufacturer;
         this.model = model.model;
-        this.isActive = model.isActive;
+        this.isInstalled = model.isInstalled;
         this.installDate = model.installDate;
-        this.retireDate = model.retireDate;
-        this.history = model.history?.length > 0 ?
-            model.history?.map(v => v ? new ComponentEventDto(v) : null) : [];
+        this.uninstallDate = model.uninstallDate;
+        this.eventHistory = model.eventHistory?.length > 0 ?
+            model.eventHistory?.map(v => v ? new ComponentEventDto(v) : null) : [];
+        this.serviceIntervals = model.serviceIntervals?.length > 0 ?
+            model.serviceIntervals?.map(v => v ? new ComponentServiceDto(v) : null) : [];
 
-        // Compute totals from history
-        this.totalDistance = model.history?.reduce( (acc, cur) => acc + (cur?.distance ?? 0), 0);
-        this.totalTime = model.history?.reduce( (acc, cur) => acc + (cur?.time ?? 0), 0);
+        // Compute totals from event history
+        this.totalDistance = model.eventHistory?.reduce( (acc, cur) => acc + (cur?.distance ?? 0), 0);
+        this.totalTime = model.eventHistory?.reduce( (acc, cur) => acc + (cur?.time ?? 0), 0);
     }
-}
+};
 
 const getComponentById = async function(userId, componentId) {
     try {
@@ -123,7 +136,7 @@ const addComponentEvent = async function(userId, componentId, componentEventDto)
             userId: userId,
             _id: componentId
         }, { 
-            $push: { history: componentEventDto } 
+            $push: { eventHistory: componentEventDto } 
         }, {
             new: true
         });
@@ -153,7 +166,7 @@ const getComponentEvent = async function(userId, componentId, componentEventId) 
         });
 
         // Now find the specific event
-        const event = componentModel?.history?.find(e => e.id === componentEventId);
+        const event = componentModel?.eventHistory?.find(e => e.id === componentEventId);
         if (!event) {
             return null;
         }
@@ -184,7 +197,7 @@ const updateComponentEvent = async function(userId, componentId, componentEventI
         });
 
         // Now find the specific event
-        const event = componentModel?.history?.find(e => e.id === componentEventId);
+        const event = componentModel?.eventHistory?.find(e => e.id === componentEventId);
         if (!event) {
             return null;
         }
@@ -220,7 +233,7 @@ const removeComponentEvent = async function(userId, componentId, componentEventI
         });
 
         // Return the event
-        const event = componentModel?.history?.find(e => e.id === componentEventId);
+        const event = componentModel?.eventHistory?.find(e => e.id === componentEventId);
         return !event ? null : new ComponentEventDto(event);
     } catch (error) {
         console.log('Error removing component event', error);
@@ -247,12 +260,17 @@ const synchronizeComponentRides = async function(userId, componentId) {
             _id: componentId
         });
 
-        // Access component history
-        const componentHistory = componentModel.history;
+        // Make sure component history exists
+        if (!componentModel.eventHistory) {
+            componentModel.eventHistory = [];
+        }
+
+        // Access component event history
+        const componentHistory = componentModel.eventHistory;
 
         // Retrieve the user's ride data using date range of component installation life
         const startDate = componentModel.installDate || new Date(Date.now());
-        const endDate = componentModel.retireDate || new Date(Date.now());
+        const endDate = componentModel.uninstallDate || new Date(Date.now());
         const rides = await RideModel.find({
             userId: userId,
             startDate: { $gte: startDate, $lte: endDate },
@@ -263,7 +281,7 @@ const synchronizeComponentRides = async function(userId, componentId) {
         let totalRides = 0;
         for (let index = 0; index < rides.length; index++) {
             const ride = rides[index];
-            if (!componentHistory.find(e => e.rideId === ride.rideId)) {
+            if (!componentHistory?.find(e => e.rideId === ride.rideId)) {
                 // This ride is not present
                 console.log('Adding ride ' + ride.rideId + ' to history of component ' + componentId);
                 const event = new ComponentEventDto({
