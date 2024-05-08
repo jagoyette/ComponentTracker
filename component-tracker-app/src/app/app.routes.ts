@@ -3,11 +3,13 @@ import { HomePageComponent } from './components/home-page/home-page.component';
 import { LoginPageComponent } from './components/login-page/login-page.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { ProfilePageComponent } from './components/profile-page/profile-page.component';
+import { ComponentsPageComponent } from './components/components-page/components-page.component';
 
 export const routes: Routes = [
     { path: "home", component: HomePageComponent },
     { path: "login", component: LoginPageComponent },
     { path: "profile", component: ProfilePageComponent },
+    { path: "components", component: ComponentsPageComponent },
 
     // Wildcards and redirect routes
     { path: '', redirectTo: '/home', pathMatch: 'full' },

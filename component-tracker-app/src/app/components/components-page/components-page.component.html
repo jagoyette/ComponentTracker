@@ -1,0 +1,44 @@
+<h3>My Components</h3>
+
+<ul style="height: 120px; overflow: scroll;">
+    <li *ngFor="let component of myComponents">
+        <span>{{component.name}}</span>
+        <button (click)="onSelect(component)">Select</button>
+        <button (click)="onDelete(component)">Delete</button>
+    </li>    
+</ul>
+
+<button (click)="onAddComponent()">Add New Component</button>
+<div *ngIf="newComponent && !selectedComponent">
+    <div>Create a new component</div>
+    <div>
+        <label for="category">Category: </label>
+        <input id="category" [(ngModel)]="newComponent.category" placeholder="category">
+    </div>
+    <div>
+        <label for="name">Name: </label>
+        <input id="name" [(ngModel)]="newComponent.name" placeholder="name">
+    </div>
+    <div>
+        <label for="description">description: </label>
+        <input id="description" [(ngModel)]="newComponent.description" placeholder="description">
+    </div>
+    <div>
+        <label for="manufacturer">manufacturer: </label>
+        <input id="manufacturer" [(ngModel)]="newComponent.manufacturer" placeholder="manufacturer">
+    </div>
+    <div>
+        <label for="model">model: </label>
+        <input id="model" [(ngModel)]="newComponent.model" placeholder="model">
+    </div>
+    <div>
+        <label for="installDate">installDate: </label>
+        <input id="installDate" [(ngModel)]="newComponent.installDate" placeholder="installDate">
+    </div>
+
+    <button type="submit" (click)="onAdd(newComponent)">Submit</button>
+</div>
+
+<div *ngIf="selectedComponent">
+    <app-component-detail [component]="selectedComponent"></app-component-detail>
+</div>

@@ -1,12 +1,19 @@
 const mongoose = require("mongoose");
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 const Schema = mongoose.Schema;
 
-// The Strava Token scheme stores access tokens required to access the athlete's data
+// The Strava Token schema stores access tokens required to access the athlete's data
 const stravaTokenSchema = new Schema({
     userId: { type: String, required: true },   // link to User schema
     accessToken: String,
     expiresAt: Date,
     refreshToken: String
+});
+
+// Encrypt the token fields
+stravaTokenSchema.plugin(mongooseFieldEncryption, {
+    fields: ["accessToken", "refreshToken"],
+    secret: process.env.MONGOOSE_SECRET,
 });
 
 const StravaToken = mongoose.model('StravaToken', stravaTokenSchema);
@@ -22,7 +29,10 @@ StravaToken.createOrUpdateToken = async function(stravaToken) {
     const token = await StravaToken.findOneAndUpdate(
         {userId: stravaToken.userId },      // filter
         stravaToken,                        // update
-        { upsert: true }                    // options - insert if not found
+        { 
+            upsert: true,                   // options - insert if not found
+            new: true,                      // return new / modified doc
+         }                    
     );
 
     return token;

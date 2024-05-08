@@ -1,11 +1,14 @@
 const express = require("express");
 const StravaController = require('../controllers/stravaAthlete');
+const StravaTokenController = require('../controllers/stravaToken');
 const { isAuthenticated } = require('../middleware/authenticated');
 
 const router = express.Router();
 
+// Retrieve info about Strava athlete
 router.get('/athlete', isAuthenticated, async (req, res) => {
-    const athlete = await StravaController.getAthleteByUserId(req.user.userId);
+    const userId = req.user.userId;
+    const athlete = await StravaController.getAthleteByUserId(userId);
     if (!athlete) {
         res.status(404).send({
             error: {
@@ -15,6 +18,28 @@ router.get('/athlete', isAuthenticated, async (req, res) => {
         });
     } else {
         res.send(athlete);
+    }
+});
+
+// Delete Strava Integration
+router.delete('/athlete', isAuthenticated, async (req, res) => {
+    const userId = req.user.userId;
+
+    try {
+        // delete stored tokens
+        await StravaTokenController.deleteToken(userId);
+        await StravaController.deleteAthlete(userId);
+
+        // return success
+        res.send({
+            status: 'Success'
+        });
+    } catch (error) {
+        console.log('Error deleting athlete', error);
+        res.send({
+            status: 'Error',
+            error: error
+        });
     }
 });
 

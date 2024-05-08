@@ -19,6 +19,9 @@ app.use('/auth', authRoutes);
 const stravaRoutes = require('./routes/strava.routes');
 app.use('/strava', stravaRoutes);
 
+const compRoutes = require('./routes/component.routes');
+app.use('/component', compRoutes);
+
 // Serve the Angular app from our 'public' folder
 const express = require('express');
 const path = require('path');
