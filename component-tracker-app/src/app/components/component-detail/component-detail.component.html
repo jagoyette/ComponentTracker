@@ -46,6 +46,19 @@
 
     <br>
     <div>
+        <b>Service Intervals</b>
+        <ul>
+            <li *ngFor="let service of component.serviceIntervals">
+                <span>
+                    {{service.name}} | {{service.description}} | {{service.distance}}m
+                </span>
+                <span *ngIf="component.totalDistance > service.distance"><b>!!Needs Servicing!!</b></span>
+            </li>    
+        </ul>
+    </div>
+
+    <br>
+    <div>
         <b>Event History</b>
         <ul>
             <li *ngFor="let event of component.eventHistory">
