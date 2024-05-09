@@ -19,6 +19,11 @@ export class ComponentsPageComponent implements OnInit {
   public myComponents : ComponentModel[] = [];
   public selectedComponent: ComponentModel | undefined;
   public newComponent: ComponentModel | undefined;
+  public serviceInterval = {
+    name: "MaxLife",
+    description: "Maximum lifetime of component",
+    distance: 0
+  };
 
 
   ngOnInit(): void {
@@ -50,14 +55,6 @@ export class ComponentsPageComponent implements OnInit {
     }
   }
 
-  onAddComponent(): void {
-    this.newComponent = new ComponentModel();
-    this.newComponent.installDate = new Date();
-    this.newComponent.isInstalled = true;
-
-    this.selectedComponent = undefined;
-  }
-
   onAdd(component: ComponentModel): void {
     this.apiService.createComponent(component).subscribe(data => {
       // update our local list
@@ -68,4 +65,16 @@ export class ComponentsPageComponent implements OnInit {
       this.newComponent = undefined;
     });
   }
+
+  onAddComponent(): void {
+    this.newComponent = new ComponentModel();
+    this.newComponent.installDate = new Date();
+    this.newComponent.isInstalled = true;
+
+    // Insert a service interval
+    this.newComponent.serviceIntervals = [this.serviceInterval];
+    this.selectedComponent = undefined;
+  }
+
+
 }

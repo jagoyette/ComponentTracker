@@ -1,16 +1,25 @@
 <h3>My Components</h3>
 
-<ul style="height: 120px; overflow: scroll;">
-    <li *ngFor="let component of myComponents">
-        <span>{{component.name}}</span>
-        <button (click)="onSelect(component)">Select</button>
-        <button (click)="onDelete(component)">Delete</button>
-    </li>    
-</ul>
+
+<table style="text-align: left;height: 120px; overflow: scroll;">
+    <tr>
+        <th>Category</th>
+        <th>Name</th>
+        <th>Select</th>
+        <th>Delete</th>
+    </tr>
+    <tr *ngFor="let component of myComponents">
+        <td>{{component.category}}</td>
+        <td>{{component.name}}</td>
+        <td><button (click)="onSelect(component)">Select</button></td>
+        <td><button (click)="onDelete(component)">Delete</button></td>
+    </tr>
+</table>
 
 <button (click)="onAddComponent()">Add New Component</button>
 <div *ngIf="newComponent && !selectedComponent">
-    <div>Create a new component</div>
+    <br>
+    <div><b>Create a new component</b></div>
     <div>
         <label for="category">Category: </label>
         <input id="category" [(ngModel)]="newComponent.category" placeholder="category">
@@ -20,22 +29,30 @@
         <input id="name" [(ngModel)]="newComponent.name" placeholder="name">
     </div>
     <div>
-        <label for="description">description: </label>
+        <label for="description">Description: </label>
         <input id="description" [(ngModel)]="newComponent.description" placeholder="description">
     </div>
     <div>
-        <label for="manufacturer">manufacturer: </label>
+        <label for="manufacturer">Manufacturer: </label>
         <input id="manufacturer" [(ngModel)]="newComponent.manufacturer" placeholder="manufacturer">
     </div>
     <div>
-        <label for="model">model: </label>
+        <label for="model">Model: </label>
         <input id="model" [(ngModel)]="newComponent.model" placeholder="model">
     </div>
     <div>
-        <label for="installDate">installDate: </label>
+        <label for="installDate">Date Installed: </label>
         <input id="installDate" [(ngModel)]="newComponent.installDate" placeholder="installDate">
     </div>
 
+    <br>
+    <div><b>Service Interval</b></div>
+    <div>
+        <label for="serviceDistance">Maximum Distance (m): </label>
+        <input id="serviceDistance" [(ngModel)]="serviceInterval.distance" placeholder="distance (m)">
+    </div>
+
+    <br>
     <button type="submit" (click)="onAdd(newComponent)">Submit</button>
 </div>
 
