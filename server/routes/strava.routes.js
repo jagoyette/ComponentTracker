@@ -44,11 +44,6 @@ router.delete('/athlete', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/statistics', isAuthenticated, async (req, res) => {
-    const stats = await StravaController.getAthleteStats(req.user.userId);
-    res.send(stats);
-});
-
 router.post('/synchronize', isAuthenticated, async (req, res) => {
     // First make sure we have a valid Strava user
     const userId = req.user.userId;
@@ -82,8 +77,7 @@ router.post('/synchronize', isAuthenticated, async (req, res) => {
         }
     );
     res.send({
-        result: 'Sync started',
-        currentStats: await StravaController.getAthleteStats(req.user.userId)
+        result: 'Sync started'
     });
 });
 

@@ -32,33 +32,6 @@ const getAthleteByUserId = async function(userId) {
     }
 };
 
-// Retrieve cummulative statistics for an athlete's rides
-const getAthleteStats = async function(userId) {
-    try {
-     // Use aggregate function to get cummulative rider stats
-     const athleteStats = await Ride.aggregate([
-        { $match: { userId: userId} },
-        { $group: {
-            _id: null,
-            totalRides: { $sum: 1 },
-            totalDistance: { $sum: "$distance" },
-            totalTime: { $sum: "$movingTime" }
-        }},
-        { $project: {
-            _id: 0,
-            totalRides: 1,
-            totalDistance: 1,
-            totalTime: 1
-        }}
-    ]);
-
-    return athleteStats.at(0);
-
-    } catch (error) {
-        console.log('Error retrieving athlete statistics', error);
-    }
-};
-
 const deleteAthlete = async function(userId) {
     try {
         await AthleteRepository.deleteMany( {userId: userId})
@@ -158,7 +131,6 @@ const synchronizeRides = async function(userId) {
 
 module.exports = {
     getAthleteByUserId,
-    getAthleteStats,
     deleteAthlete,
     synchronizeRides
 }

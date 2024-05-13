@@ -24,20 +24,31 @@
         <button (click)="logout()">Logout</button>
     </p>
 
-    <!-- Show a link to integrate Strava if not interated yet -->
-        <div [hidden]="stravaUser">
-            <a href="{{stravaIntegrationUrl}}"><button>Integrate Strava</button></a>
-        </div>
-        <div [hidden]="!stravaUser">
-            <button (click)="disconnectStrava()">Disconnect Strava</button>
-        </div>
+    <div>Total Rides: {{ rideStats?.totalRides }}</div>
+    <div>Total Distance: {{ rideStats?.totalDistance }}</div>
+    <div>Total Time: {{ rideStats?.totalTime }}</div>
+
+    <!-- Show a link to integrate Strava if not integrated yet -->
+    <div [hidden]="stravaUser">
+        <a href="{{stravaIntegrationUrl}}"><button>Integrate Strava</button></a>
+    </div>
+    <div [hidden]="!stravaUser">
+        <button (click)="disconnectStrava()">Disconnect Strava</button>
+    </div>
 
     <div [hidden]="!stravaUser">
-        <div>Total Rides: {{ stravaStats?.totalRides }}</div>
-        <div>Total Distance: {{ stravaStats?.totalDistance }}</div>
-        <div>Total Time: {{ stravaStats?.totalTime }}</div>
-
-        <br>
         <button (click)="syncronizeStravaRides()">Sync Strava Rides</button>
     </div>
+
+     <!-- Show a link to integrate Ride with GPS if not integrated yet -->
+     <div [hidden]="rwgpsUser">
+        <a href="{{rwgpsIntegrationUrl}}"><button>Integrate Ride with GPS</button></a>
+    </div>
+    <div [hidden]="!rwgpsUser">
+        <button (click)="disconnectRwgps()">Disconnect Ride with GPS</button>
+    </div>
+
+    <div [hidden]="!rwgpsUser">
+        <button (click)="syncronizeRwgpsRides()">Sync Ride with GPS Rides</button>
+    </div>   
 </div>  

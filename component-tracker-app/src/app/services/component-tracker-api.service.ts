@@ -26,6 +26,14 @@ export class ComponentTrackerApiService {
     return this.http.post(url, null);
   }
 
+  getRideStats(): Observable<any> {
+    const url = this.baseUrl + 'ride/statistics'
+    return this.http.get(url);
+  }
+
+  /*************************************************************************
+   * Strava API
+   */
   getStravaAthlete(): Observable<any> {
     const url = this.baseUrl + 'strava/athlete'
     return this.http.get(url);
@@ -36,13 +44,26 @@ export class ComponentTrackerApiService {
     return this.http.delete(url);
   }
 
-  getStravaStats(): Observable<any> {
-    const url = this.baseUrl + 'strava/statistics'
+  synchronizeStravaRides(): Observable<any> {
+    const url = this.baseUrl + 'strava/synchronize'
+    return this.http.post(url, null);
+  }
+
+  /***************************************************************************
+   * Ride with GPS API
+   */
+  getRwgpsAthlete(): Observable<any> {
+    const url = this.baseUrl + 'rwgps/athlete'
     return this.http.get(url);
   }
 
-  synchronizeStravaRides(): Observable<any> {
-    const url = this.baseUrl + 'strava/synchronize'
+ deleteRwgpsAthlete(): Observable<any> {
+    const url = this.baseUrl + 'rwgps/athlete'
+    return this.http.delete(url);
+  }
+
+  synchronizeRwgpsRides(): Observable<any> {
+    const url = this.baseUrl + 'rwgps/synchronize'
     return this.http.post(url, null);
   }
 

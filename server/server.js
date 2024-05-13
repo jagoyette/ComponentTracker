@@ -16,6 +16,9 @@ app.use(passport.session());
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
+const rideRoutes = require('./routes/ride.routes');
+app.use('/ride', rideRoutes);
+
 const stravaRoutes = require('./routes/strava.routes');
 app.use('/strava', stravaRoutes);
 
