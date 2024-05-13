@@ -19,6 +19,9 @@ app.use('/auth', authRoutes);
 const stravaRoutes = require('./routes/strava.routes');
 app.use('/strava', stravaRoutes);
 
+const rwgpsRoutes = require('./routes/rwgps.routes');
+app.use('/rwgps', rwgpsRoutes);
+
 const compRoutes = require('./routes/component.routes');
 app.use('/component', compRoutes);
 

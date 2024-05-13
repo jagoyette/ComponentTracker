@@ -43,4 +43,22 @@ Ride.fromStravaRide = function(userId, stravaRide) {
     };
 }
 
+Ride.fromRwgpsRide = function(userId, rwgpsRide) {
+    return {
+        userId: userId,
+        provider: 'RWGPS',
+        rideId: rwgpsRide.id,
+        athleteId: rwgpsRide.user_id,
+        title: rwgpsRide.name,
+        description: rwgpsRide.description,
+        distance: rwgpsRide.distance,
+        startDate: rwgpsRide.departed_at,
+        movingTime: rwgpsRide.moving_time,
+        gearId: rwgpsRide.gear_id,
+        type: rwgpsRide.activity_type_id,
+        sportType: rwgpsRide.activity_category_id,
+        trainer: rwgpsRide.is_stationary,
+    };
+}
+
 module.exports = Ride;

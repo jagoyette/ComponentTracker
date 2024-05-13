@@ -5,8 +5,9 @@ const Url = require("url");
 
 const StravaAthlete = require("../models/strava.athlete");
 const StravaToken = require("../models/strava.token");
+const RwgpsAthlete = require('../models/rwgps.athlete');
 const UserController = require('../controllers/user');
-const TokenController = require('../controllers/stravaToken');
+const RwgpsToken = require("../models/rwgps.token");
 
 const router = express.Router();
 
@@ -108,6 +109,9 @@ router.get('/google/failure', (req, res) => {
     res.send('No dice');
 });
 
+///////////////////////////////////////////////////////////////////////////////
+// Strava Integration
+///////////////////////////////////////////////////////////////////////////////
 
 // Integrate Strava with user account
 // This route initiates an OAuth workflow to approve integration
@@ -196,6 +200,101 @@ router.get('/strava/callback', async function (req, res, next) {
 
 router.get('/strava/failure', (req, res) => {
     console.error('Strava integration falied');
+    res.send('No dice');
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// Ride With GPS Integration
+///////////////////////////////////////////////////////////////////////////////
+
+// Integrate Ride With GPS with user account
+// This route initiates an OAuth workflow to approve integration
+// of the users RWGPS account with this app. The user will be redirected
+// to a RWGPS site where they must approve or reject the integration.
+// The RWGPS site will call our redirect_url below (see /rwgps/callback)
+router.get('/rwgps/integrate', (req, res, next) => {
+    const client_id = process.env.RWGPS_CLIENT_ID;
+    const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    const callback = Url.resolve(fullUrl, req.baseUrl + '/rwgps/callback');
+    const state = encodeStateRedirects(req, '/', '../rwgps/failure');
+
+    // build the RWGPS url and redirect user
+    const url = new URL('http://ridewithgps.com/oauth/authorize');
+    url.searchParams.append('client_id', client_id);
+    url.searchParams.append('redirect_uri', callback);
+    url.searchParams.append('response_type', 'code');
+    url.searchParams.append('state', state);
+
+    res.redirect(url);
+});
+
+// Callback (redirect_uri) called by RWGPS Oauth
+// If the user approved the integration, we will have and authorization
+// code in the query params of this request url
+router.get('/rwgps/callback', async function (req, res, next) {
+    // extract the authorization code
+    const { code, state, scope }= req.query;
+    const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../rwgps/failure');
+    const url = "https://ridewithgps.com/oauth/token.json";
+    const client_id = process.env.RWGPS_CLIENT_ID;
+    const client_secret = process.env.RWGPS_CLIENT_SECRET;
+
+    if (code) {
+        // Get the userId of the current user
+        const userId = req.user?.userId;
+        if (!userId) {
+            console.error('Cannot integrate RWGPS without signing in');
+            res.redirect(failureRedirect);
+            return;
+        }
+        
+        try {
+            // Exchange the authorization code for an access token
+            const body = {
+                client_id: client_id,
+                client_secret: client_secret,
+                grant_type: "authorization_code",
+                code: code,
+                redirect_uri: "http://localhost:3000/auth/rwgps/callback"
+            };
+            let result = await axios.post(url, body);
+
+            // create token container from response
+            const rwgpsToken = RwgpsToken.createFromRwgps(userId, result.data);
+
+            // retrieve current user info
+            result = await axios.get('https://ridewithgps.com/users/current.json', {
+                headers: {
+                    Authorization: "Bearer " + rwgpsToken.accessToken
+                }
+            });
+
+            // Create the athlete if needed
+            const user = result?.data?.user;
+            const rwgpsAthlete = RwgpsAthlete.fromAthlete(userId, user);
+            const rwgpsAthleteModel = await RwgpsAthlete.findOrCreateAthlete(userId, rwgpsAthlete);
+            console.log(`Ride with GPS Athlete ${rwgpsAthleteModel.id} integrated for user ${userId}`);
+
+            // Store the access token
+            const tokenModel = await RwgpsToken.createOrUpdateToken(rwgpsToken);
+
+            // finally redirect to success url
+            res.redirect(successRedirect);
+            return;
+
+        } catch (error) {
+            console.log(`Error getting token`, error);
+            console.log(error.response.data);
+        }
+    }
+
+    // Failed to get authorization
+    res.redirect(failureRedirect);
+    return;
+});
+
+router.get('/rwgps/failure', (req, res) => {
+    console.error('RWGPS integration falied');
     res.send('No dice');
 });
 
