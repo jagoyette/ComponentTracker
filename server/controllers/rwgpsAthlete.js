@@ -26,9 +26,9 @@ class RwgpsAthleteDto {
 const getAthleteByUserId = async function(userId) {
     try {
         const athlete = await AthleteRepository.findOne({userId});
-        return !athlete ? null : new RwgpsAthleteDto(athlete);           
+        return !athlete ? null : new RwgpsAthleteDto(athlete);
     } catch (error) {
-        console.log('Error retrieving athlete', error);       
+        console.log('Error retrieving athlete', error);
     }
 };
 
@@ -55,7 +55,7 @@ const getAthleteStats = async function(userId) {
     return athleteStats.at(0);
 
     } catch (error) {
-        console.log('Error retrieving athlete statistics', error);               
+        console.log('Error retrieving athlete statistics', error);
     }
 };
 
@@ -76,10 +76,10 @@ const synchronizeRides = async function(userId) {
             console.log(`User Id ${userId} not found`);
             return;
         }
-    
-        const name = `${athlete.firstname} ${athlete.lastname}`;
+
+        const name = `${athlete.firstName} ${athlete.lastName}`;
         console.log('Synchronizing RWGPS rides for Athlete ' + name);
-    
+
         // get the token
         const tokenContainer = await TokenController.getToken(userId);
         const url = `https://ridewithgps.com/users/${tokenContainer.rwgpsUserId}/trips.json`;
@@ -107,7 +107,7 @@ const synchronizeRides = async function(userId) {
                         "x-rwgps-api-version": rwgpsApiVersion
                     }
                 });
-                
+
                 // Break out of paged query when we get back no results
                 const rwgpsTotalRides = result.data?.results_count;
                 const rwgpsRides = result.data?.results;
@@ -121,13 +121,22 @@ const synchronizeRides = async function(userId) {
                 // Iterate and update/add each ride
                 rides.forEach( async (ride) => {
                     try {
-                        // update this ride
-                        const res = await Ride.findOneAndUpdate({
-                            rideId: ride.rideId
-                        }, ride, {
-                            upsert: true,       // Insert if not found
-                            new: true,          // Return new/modified doc
-                        });                        
+                        const rideId = ride.rideId;
+
+                        // check if this ride already exists from another provider
+                        const prevRide = await Ride.findOne({
+                            externalId: { $regex: rideId + '*' }
+                        });
+
+                        if (!prevRide) {
+                            // add/update this ride
+                            await Ride.findOneAndUpdate({
+                                rideId: rideId
+                            }, ride,
+                            {
+                                upsert: true,       // Insert if not found
+                            });
+                        }
                     } catch (error) {
                         console.log('Error updating ride ' + ride?.rideId, error);
                     }
@@ -140,10 +149,10 @@ const synchronizeRides = async function(userId) {
             // try next set
             offset += limit;
         }
-    
-        return numRides;       
+
+        return numRides;
     } catch (error) {
-        console.log('Error synchronizing athlete rides', error);     
+        console.log('Error synchronizing athlete rides', error);
     }
 };
 

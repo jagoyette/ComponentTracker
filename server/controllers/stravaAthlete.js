@@ -8,8 +8,8 @@ class StravaAthleteDto {
     constructor(stravaAthlete) {
         this.userId = stravaAthlete?.userId;
         this.id = stravaAthlete?.id;
-        this.firstname = stravaAthlete?.firstname;
-        this.lastname = stravaAthlete?.lastname;
+        this.firstName = stravaAthlete?.firstname;
+        this.lastName = stravaAthlete?.lastname;
         this.profileMedium = stravaAthlete?.profileMedium;
         this.profile = stravaAthlete?.profile;
         this.city = stravaAthlete?.city;
@@ -77,7 +77,7 @@ const synchronizeRides = async function(userId) {
             return;
         }
     
-        const name = `${athlete.firstname} ${athlete.lastname}`;
+        const name = `${athlete.firstName} ${athlete.lastName}`;
         console.log('Synchronizing Strava rides for Athlete ' + name);
     
         // get the token
