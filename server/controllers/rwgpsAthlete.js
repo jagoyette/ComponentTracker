@@ -64,6 +64,7 @@ const synchronizeRides = async function(userId) {
         // Keep looping until we retrieved all pages
         console.log(`Checking rides for athlete ${name}...`);
         let numRides = 0;
+        let duplicates = 0;
         let offset = 0;
         const limit = 100;
         while (1) {
@@ -94,34 +95,33 @@ const synchronizeRides = async function(userId) {
                 // Iterate and update/add each ride
                 rides.forEach( async (ride) => {
                     try {
-                        const rideId = ride.rideId;
-
-                        // check if this ride already exists from another provider
-                        const prevRide = await Ride.findOne({
-                            externalId: { $regex: rideId + '*' }
+                        // update this ride
+                        const res = await Ride.findOneAndUpdate({
+                            rideId: ride.rideId
+                        }, ride, {
+                            upsert: true,       // Insert if not found
+                            new: true,          // Return new/modified doc
                         });
 
-                        if (!prevRide) {
-                            // add/update this ride
-                            await Ride.findOneAndUpdate({
-                                rideId: rideId
-                            }, ride,
-                            {
-                                upsert: true,       // Insert if not found
-                            });
-                        }
+                        numRides++;
                     } catch (error) {
-                        console.log('Error updating ride ' + ride?.rideId, error);
+                        if (error.codeName === 'DuplicateKey') {
+                            duplicates++;
+                        } else {
+                            console.log('Error updating ride ' + ride?.rideId, error);
+                        }
                     }
                 });
             } catch (error) {
-                console.log('Error retreiving rwgps activities', error);
+                console.log('Error retrieving rwgps activities', error);
                 break;
             }
 
             // try next set
             offset += limit;
         }
+
+        console.log(`Finished Synchronizing RWGPS rides - ${numRides} updated, ${duplicates} duplicates suppressed.`);
 
         return numRides;
     } catch (error) {
