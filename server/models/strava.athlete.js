@@ -6,8 +6,8 @@ const Schema = mongoose.Schema;
 const stravaAthleteSchema = new Schema({
     userId: { type: String, required: true },   // link to User schema
     id: { type: String, required: true, unique: true },       // Strava athlete Id
-    firstname: String,
-    lastname: String,
+    firstName: String,
+    lastName: String,
     profileMedium: String,                     // med profile pic url
     profile: String,                            // profile pic url
     city: String,
@@ -27,8 +27,8 @@ StravaAthlete.fromAthlete = function(userId, athlete) {
     return {
         userId: userId,
         id: athlete.id,
-        firstname: athlete.firstname,
-        lastname: athlete.lastname,
+        firstName: athlete.firstname,
+        lastName: athlete.lastname,
         profileMedium: athlete.profile_medium,
         profile: athlete.profile,
         city: athlete.city,

@@ -17,9 +17,11 @@ export class ProfilePageComponent implements OnInit{
   constructor (private apiService: ComponentTrackerApiService) {}
 
   public user: User | null = null;
+  public rideStats: any | null = null;
   public stravaUser: any | null = null;
-  public stravaStats: any | null = null;
   public stravaIntegrationUrl: String | null = null;
+  public rwgpsUser: any | null = null;
+  public rwgpsIntegrationUrl: String | null = null;
 
   ngOnInit(): void {
     // Retrieve the currently logged in user
@@ -32,12 +34,20 @@ export class ProfilePageComponent implements OnInit{
     this.apiService.getStravaAthlete().subscribe(data => {
       this.stravaUser = data;
       console.log('Strava User', this.stravaUser);
-      // Get user's stats
-      this.updateStravaStats();
     }, err => {
       console.log('No Strava Integration');
     });
  
+    this.apiService.getRwgpsAthlete().subscribe(data => {
+      this.rwgpsUser = data;
+      console.log('RWGPS User', this.rwgpsUser);
+    }, err => {
+      console.log('No RWGPS Integration');
+    });
+
+    // Get user's stats
+    this.updateRideStats();
+
     // Build the strava integration url
     const origin = window.location.origin;
 
@@ -45,6 +55,7 @@ export class ProfilePageComponent implements OnInit{
     const successUrl = `${origin}/profile`;
     const failureUrl = `${origin}/strava/failure`;
     this.stravaIntegrationUrl = `${environment.API_SERVER_URL}auth/strava/integrate?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
+    this.rwgpsIntegrationUrl = `${environment.API_SERVER_URL}auth/rwgps/integrate?successRedirect=${origin}/profile&failureRedirect=${origin}/rwgps/failure`;
   }
 
   logout(): void {
@@ -55,23 +66,36 @@ export class ProfilePageComponent implements OnInit{
     });
   }
 
+  updateRideStats(): void {
+    this.apiService.getRideStats().subscribe(data => {
+      this.rideStats = data;
+      console.log(data);
+    });
+  }
+  
   disconnectStrava(): void {
     this.apiService.deleteStravaAthlete().subscribe(result => {
       console.log(result);
       this.stravaUser = null;
-      this.stravaStats = null;
+      this.rideStats = null;
     })
   };
 
-  updateStravaStats(): void {
-    this.apiService.getStravaStats().subscribe(data => {
-      this.stravaStats = data;
-      console.log(data);
+  syncronizeStravaRides() : void {
+    this.apiService.synchronizeStravaRides().subscribe(result => {
+      console.log('Sync results: ', result);
     });
   }
 
-  syncronizeStravaRides() : void {
-    this.apiService.synchronizeStravaRides().subscribe(result => {
+  disconnectRwgps(): void {
+    this.apiService.deleteRwgpsAthlete().subscribe(result => {
+      console.log(result);
+      this.rwgpsUser = null;
+    })
+  };
+
+  syncronizeRwgpsRides() : void {
+    this.apiService.synchronizeRwgpsRides().subscribe(result => {
       console.log('Sync results: ', result);
     });
   }

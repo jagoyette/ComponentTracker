@@ -20,6 +20,11 @@ const rideSchema = new Schema({
     commute: Boolean,                               // Flag indicating if ride was a commute
 });
 
+// Create a unique compound index for user rides and start date
+// This ensures that a ride by a user cannot be imported twice by
+// two different providers
+rideSchema.index({ userId: 1, startDate: 1 }, { unique: true });
+
 const Ride = mongoose.model('Ride', rideSchema);
 
 /// Creates an instance of a Ride data object using an activity from Strava
@@ -40,6 +45,24 @@ Ride.fromStravaRide = function(userId, stravaRide) {
         sportType: stravaRide.sport_type,
         trainer: stravaRide.trainer,
         commute: stravaRide.commute,
+    };
+}
+
+Ride.fromRwgpsRide = function(userId, rwgpsRide) {
+    return {
+        userId: userId,
+        provider: 'RWGPS',
+        rideId: rwgpsRide.id,
+        athleteId: rwgpsRide.user_id,
+        title: rwgpsRide.name,
+        description: rwgpsRide.description,
+        distance: rwgpsRide.distance,
+        startDate: rwgpsRide.departed_at,
+        movingTime: rwgpsRide.moving_time,
+        gearId: rwgpsRide.gear_id,
+        type: rwgpsRide.activity_type_id,
+        sportType: rwgpsRide.activity_category_id,
+        trainer: rwgpsRide.is_stationary,
     };
 }
 

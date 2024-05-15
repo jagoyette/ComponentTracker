@@ -1,20 +1,19 @@
 const express = require("express");
-const StravaController = require('../controllers/stravaAthlete');
-const StravaTokenController = require('../controllers/stravaToken');
+const RwgpsController = require('../controllers/rwgpsAthlete');
 const { isAuthenticated } = require('../middleware/authenticated');
 const ComponentController = require('../controllers/component');
 
 const router = express.Router();
 
-// Retrieve info about Strava athlete
+// Retrieve info about Rwgps athlete
 router.get('/athlete', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
-    const athlete = await StravaController.getAthleteByUserId(userId);
+    const athlete = await RwgpsController.getAthleteByUserId(userId);
     if (!athlete) {
         res.status(404).send({
             error: {
                 status: 'Not Found',
-                message: 'User does not have a Strava integration'
+                message: 'User does not have a RWGPS integration'
             }
         });
     } else {
@@ -22,14 +21,13 @@ router.get('/athlete', isAuthenticated, async (req, res) => {
     }
 });
 
-// Delete Strava Integration
+// Delete Rwgps Integration
 router.delete('/athlete', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
 
     try {
-        // delete stored tokens
-        await StravaTokenController.deleteToken(userId);
-        await StravaController.deleteAthlete(userId);
+        // delete athlete
+        await RwgpsController.deleteAthlete(userId);
 
         // return success
         res.send({
@@ -47,12 +45,12 @@ router.delete('/athlete', isAuthenticated, async (req, res) => {
 router.post('/synchronize', isAuthenticated, async (req, res) => {
     // First make sure we have a valid Strava user
     const userId = req.user.userId;
-    const athlete = await StravaController.getAthleteByUserId(userId);
+    const athlete = await RwgpsController.getAthleteByUserId(userId);
     if (!athlete) {
         res.status(404).send({
             error: {
                 status: 'Not Found',
-                message: 'User does not have a Strava integration'
+                message: 'User does not have a RWGPS integration'
             }
         });
         return;
@@ -60,7 +58,7 @@ router.post('/synchronize', isAuthenticated, async (req, res) => {
 
     // Here we simply launch an async process to start synchronizing strava rides
     // We do not wait for completion
-    StravaController.synchronizeRides(userId).then(
+    RwgpsController.synchronizeRides(userId).then(
         async (numRides) => {
             console.log('Syncronized ' + numRides + ' rides. Updating components...');
             const components = await ComponentController.getComponentsForUser(userId);

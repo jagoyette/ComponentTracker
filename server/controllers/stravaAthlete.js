@@ -8,8 +8,8 @@ class StravaAthleteDto {
     constructor(stravaAthlete) {
         this.userId = stravaAthlete?.userId;
         this.id = stravaAthlete?.id;
-        this.firstname = stravaAthlete?.firstname;
-        this.lastname = stravaAthlete?.lastname;
+        this.firstName = stravaAthlete?.firstname;
+        this.lastName = stravaAthlete?.lastname;
         this.profileMedium = stravaAthlete?.profileMedium;
         this.profile = stravaAthlete?.profile;
         this.city = stravaAthlete?.city;
@@ -26,36 +26,9 @@ class StravaAthleteDto {
 const getAthleteByUserId = async function(userId) {
     try {
         const athlete = await AthleteRepository.findOne({userId});
-        return !athlete ? null : new StravaAthleteDto(athlete);           
+        return !athlete ? null : new StravaAthleteDto(athlete);
     } catch (error) {
-        console.log('Error retrieving athlete', error);       
-    }
-};
-
-// Retrieve cummulative statistics for an athlete's rides
-const getAthleteStats = async function(userId) {
-    try {
-     // Use aggregate function to get cummulative rider stats
-     const athleteStats = await Ride.aggregate([
-        { $match: { userId: userId} },
-        { $group: {
-            _id: null,
-            totalRides: { $sum: 1 },
-            totalDistance: { $sum: "$distance" },
-            totalTime: { $sum: "$movingTime" }
-        }},
-        { $project: {
-            _id: 0,
-            totalRides: 1,
-            totalDistance: 1,
-            totalTime: 1
-        }}
-    ]);
-
-    return athleteStats.at(0);
-
-    } catch (error) {
-        console.log('Error retrieving athlete statistics', error);               
+        console.log('Error retrieving athlete', error);
     }
 };
 
@@ -76,23 +49,24 @@ const synchronizeRides = async function(userId) {
             console.log(`User Id ${userId} not found`);
             return;
         }
-    
-        const name = `${athlete.firstname} ${athlete.lastname}`;
+
+        const name = `${athlete.firstName} ${athlete.lastName}`;
         console.log('Synchronizing Strava rides for Athlete ' + name);
-    
+
         // get the token
         const tokenContainer = await TokenController.getToken(userId);
         const url = 'https://www.strava.com/api/v3/athlete/activities';
-    
+
         // loop over every year
         const dateStart = athlete.createdAt || new Date();
         const yearStart = dateStart.getFullYear();
         const yearNow = new Date().getFullYear();
         let numRides = 0;
+        let duplicates = 0;
         for (year = yearStart; year <= yearNow; year++) {
             console.log(`Checking rides for athlete ${name} in year ${year}...`);
             let page = 1;
-    
+
             // Keep looping until we retrieved all pages
             while (1) {
                 try {
@@ -107,16 +81,16 @@ const synchronizeRides = async function(userId) {
                             "Authorization": "Bearer " +  tokenContainer.accessToken
                         }
                     });
-                    
+
                     // Break out of paged query when we get back no results
                     const stravaRides = result.data;
                     if (!stravaRides?.length) {
                         break;
                     }
-    
+
                     console.log('Updating ' + stravaRides.length + ' Strava rides');
                     const rides = stravaRides.map( r => Ride.fromStravaRide(userId, r));
-    
+
                     // Iterate and update/add each ride
                     rides.forEach( async (ride) => {
                         try {
@@ -126,30 +100,36 @@ const synchronizeRides = async function(userId) {
                             }, ride, {
                                 upsert: true,       // Insert if not found
                                 new: true,          // Return new/modified doc
-                            });                        
+                            });
+
+                            numRides++;
                         } catch (error) {
-                            console.log('Error updating ride ' + ride?.rideId, error);
+                            if (error.codeName === 'DuplicateKey') {
+                                duplicates++;
+                            } else {
+                                console.log('Error updating ride ' + ride?.rideId, error);
+                            }
                         }
                     });
                 } catch (error) {
-                    console.log('Error retreiving Strava activities', error);
+                    console.log('Error retrieving Strava activities', error);
                     break;
                 }
-    
+
                 // Try next page
                 page++;
             }
         }
-    
-        return numRides;       
+
+        console.log(`Finished Synchronizing Strava rides - ${numRides} updated, ${duplicates} duplicates suppressed.`);
+        return numRides;
     } catch (error) {
-        console.log('Error synchronizing athlete rides', error);     
+        console.log('Error synchronizing athlete rides', error);
     }
 }
 
 module.exports = {
     getAthleteByUserId,
-    getAthleteStats,
     deleteAthlete,
     synchronizeRides
 }
