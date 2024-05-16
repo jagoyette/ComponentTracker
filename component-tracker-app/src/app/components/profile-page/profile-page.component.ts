@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
 import { ComponentTrackerApiService } from '../../services/component-tracker-api.service';
 import { User } from '../../models/user';
-import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
-import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -14,7 +16,7 @@ import { RouterModule } from '@angular/router';
 })
 export class ProfilePageComponent implements OnInit{
   
-  constructor (private apiService: ComponentTrackerApiService) {}
+  constructor (private apiService: ComponentTrackerApiService, private authService: AuthService) {}
 
   public user: User | null = null;
   public rideStats: any | null = null;
@@ -25,7 +27,7 @@ export class ProfilePageComponent implements OnInit{
 
   ngOnInit(): void {
     // Retrieve the currently logged in user
-    this.apiService.getCurrentUser().subscribe(data => {
+    this.authService.getCurrentUser().subscribe(data => {
       this.user = data;
       console.log('Current user', this.user);
     });
@@ -59,7 +61,7 @@ export class ProfilePageComponent implements OnInit{
   }
 
   logout(): void {
-    this.apiService.logout().subscribe(result => {
+    this.authService.logout().subscribe(result => {
       if (result?.success) {
         this.user = null;
       }

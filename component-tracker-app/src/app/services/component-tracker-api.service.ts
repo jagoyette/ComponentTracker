@@ -16,15 +16,7 @@ export class ComponentTrackerApiService {
 
   private readonly baseUrl = environment.API_SERVER_URL || '/';
 
-  getCurrentUser(): Observable<User> {
-    const url = this.baseUrl + 'auth/user'
-    return this.http.get<User>(url);
-  }
 
-  logout(): Observable<any> {
-    const url = this.baseUrl + 'auth/logout'
-    return this.http.post(url, null);
-  }
 
   getRideStats(): Observable<any> {
     const url = this.baseUrl + 'ride/statistics'
