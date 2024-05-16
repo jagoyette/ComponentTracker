@@ -216,9 +216,6 @@ router.get('/strava/failure', (req, res) => {
 router.get('/rwgps/integrate', (req, res, next) => {
     const client_id = process.env.RWGPS_CLIENT_ID;
     const originalUrl = Utils.originalURL(req, { proxy: true });
-
-    console.log(`originalUrl (req) is ${req.originalUrl}`);
-    console.log(`originalUrl (utils) is ${originalUrl}`);
     const callback = Url.resolve(originalUrl, req.baseUrl + '/rwgps/callback');
     const state = encodeStateRedirects(req, '/', '../rwgps/failure');
 
@@ -253,13 +250,17 @@ router.get('/rwgps/callback', async function (req, res, next) {
         }
         
         try {
+            // We need to pass the original redirect uri
+            const originalUrl = Utils.originalURL(req, { proxy: true });
+            const redirect_uri = Url.resolve(originalUrl, req.baseUrl + req.path);
+
             // Exchange the authorization code for an access token
             const body = {
                 client_id: client_id,
                 client_secret: client_secret,
                 grant_type: "authorization_code",
                 code: code,
-                redirect_uri: "http://localhost:3000/auth/rwgps/callback"
+                redirect_uri: redirect_uri
             };
             let result = await axios.post(url, body);
 
