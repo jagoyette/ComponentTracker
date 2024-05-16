@@ -8,10 +8,11 @@ import { User } from '../models/user';
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly baseUrl = environment.API_SERVER_URL || '/';
 
   constructor(private http: HttpClient) { }
   
-  private readonly baseUrl = environment.API_SERVER_URL || '/';
+  public user: User | null | undefined;
 
   getCurrentUser(): Observable<User> {
     const url = this.baseUrl + 'auth/user'
