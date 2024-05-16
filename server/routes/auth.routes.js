@@ -3,6 +3,7 @@ const passport = require("passport");
 const axios = require("axios");
 const Url = require("url");
 
+const Utils = require('../utils/network');
 const StravaAthlete = require("../models/strava.athlete");
 const StravaToken = require("../models/strava.token");
 const RwgpsAthlete = require('../models/rwgps.athlete');
@@ -214,8 +215,11 @@ router.get('/strava/failure', (req, res) => {
 // The RWGPS site will call our redirect_url below (see /rwgps/callback)
 router.get('/rwgps/integrate', (req, res, next) => {
     const client_id = process.env.RWGPS_CLIENT_ID;
-    const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    const callback = Url.resolve(fullUrl, req.baseUrl + '/rwgps/callback');
+    const originalUrl = Utils.originalURL(req, { proxy: true });
+
+    console.log(`originalUrl (req) is ${req.originalUrl}`);
+    console.log(`originalUrl (utils) is ${originalUrl}`);
+    const callback = Url.resolve(originalUrl, req.baseUrl + '/rwgps/callback');
     const state = encodeStateRedirects(req, '/', '../rwgps/failure');
 
     // build the RWGPS url and redirect user
