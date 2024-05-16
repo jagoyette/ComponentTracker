@@ -70,7 +70,12 @@ STRAVA_CLIENT_SECRET=YOUR_STAVA_APP_CLIENT_SECRET
 ```
 
 ### Run the server
-To run the server, simply execute NodeJS with the server file. Open a terminal and change to the server directory and execute the following:
+Before running the server code, you must download third party packages used by the server. This step is only needed the first time. Open a terminal and change to the server directory and execute the following:
+```
+$ yarn install
+```
+
+To run the server, simply execute NodeJS with the server file. 
 
 ```
 $ node ./server.js
@@ -79,8 +84,12 @@ $ node ./server.js
 >Note: If you want to debug the server, you can use the launch configuration available in VS Code.
 
 ### Run the Angular Client
-The client is an Angular project. You can use the standard command `ng serve` to run the development server that automatically saves and redeploys updates. Open a terminal and change to the `component-tracker-app` directory and execute the following:
+The client is an Angular project. Like the server, you must initialize the Angular project with third party packages. Open a terminal and change to the `component-tracker-app` directory and execute the following:
+```
+$ npm install
+```
 
+You can use the standard command `ng serve` to run the development server that automatically saves and redeploys updates.
 ```
 $ npm run start
 ```
