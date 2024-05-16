@@ -1,7 +1,3 @@
-const getHostingDomain = function(req) {
-
-};
-
 /**
  * Reconstructs the original URL of the request.
  *
@@ -15,7 +11,6 @@ const getHostingDomain = function(req) {
  * @param {http.IncomingMessage} req
  * @param {Object} [options]
  * @return {String}
- * @api private
  */
 const originalURL = function(req, options) {
     options = options || {};
