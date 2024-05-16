@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -10,17 +11,11 @@ import { environment } from '../../../environments/environment';
 })
 export class LoginPageComponent implements OnInit {
 
-  constructor() {}
+  constructor(private authService: AuthService) {}
 
   public loginUrl: string = "";
 
   ngOnInit(): void {
-    // Build the login url
-    const origin = window.location.origin;
-
-    // Add success and failure redirects to the login url
-    const successUrl = `${origin}/home`;
-    const failureUrl = `${origin}/login`;
-    this.loginUrl = `${environment.API_SERVER_URL}auth/google/login?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
+    this.loginUrl = this.authService.getLoginUrl();
   }
 }
