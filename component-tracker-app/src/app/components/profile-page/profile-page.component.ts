@@ -26,18 +26,18 @@ export class ProfilePageComponent implements OnInit{
 
   ngOnInit(): void {
     // check if this component is loaded in response to an integration result
-    this.activeRoute.queryParamMap.subscribe(params => {
-      const result = params.get('result');
-      const provider = params.get('provider');
-      if (result) {
-        const appStateString = this.cookieService.get('appState');
-        const appState = JSON.parse(appStateString);
-        if (appState) {
-          console.log(`Restoring application state after integration. Result = ${result}, Provider = ${provider}`);
-          this.authService.accessToken = appState;
-        }
-      }
-    });
+    // this.activeRoute.queryParamMap.subscribe(params => {
+    //   const result = params.get('result');
+    //   const provider = params.get('provider');
+    //   if (result) {
+    //     const appStateString = this.cookieService.get('appState');
+    //     const appState = JSON.parse(appStateString);
+    //     if (appState) {
+    //       console.log(`Restoring application state after integration. Result = ${result}, Provider = ${provider}`);
+    //       this.authService.accessToken = appState;
+    //     }
+    //   }
+    // });
 
     // Retrieve the currently logged in user
     this.authService.getCurrentUser().subscribe(data => {
@@ -73,8 +73,8 @@ export class ProfilePageComponent implements OnInit{
 
   integrateStrava(): void {
     const origin = window.location.origin;
-    const successUrl = `${origin}/profile?provider=strava&result=success`;
-    const failureUrl = `${origin}/profile?provider=strava&result=failure`;
+    const successUrl = `${origin}/integration/result?provider=strava&result=success&return=profile`;
+    const failureUrl = `${origin}/integration/result?provider=strava&result=failure&return=profile`;
     const appState = JSON.stringify(this.authService.accessToken);
     this.authService.integrateStrava(successUrl, failureUrl, appState).subscribe(data => {
       console.log('Starting Strava OAuth workflow');
@@ -86,8 +86,8 @@ export class ProfilePageComponent implements OnInit{
 
   integrateRwgps(): void {
     const origin = window.location.origin;
-    const successUrl = `${origin}/profile?provider=rwgps&result=success`;
-    const failureUrl = `${origin}/profile?provider=rwgps&result=failure`;
+    const successUrl = `${origin}/integration/result?provider=rwgps&result=success&return=profile`;
+    const failureUrl = `${origin}/integration/result?provider=rwgps&result=failure&return=profile`;
     const appState = JSON.stringify(this.authService.accessToken);
     this.authService.integrateRwgps(successUrl, failureUrl, appState).subscribe(data => {
       console.log('Starting RWGPS OAuth workflow');
@@ -108,7 +108,6 @@ export class ProfilePageComponent implements OnInit{
     this.apiService.deleteStravaAthlete().subscribe(result => {
       console.log(result);
       this.stravaUser = null;
-      this.rideStats = null;
     })
   };
 

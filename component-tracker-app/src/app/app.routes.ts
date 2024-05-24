@@ -5,11 +5,14 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { ProfilePageComponent } from './components/profile-page/profile-page.component';
 import { ComponentsPageComponent } from './components/components-page/components-page.component';
 import { authGuard } from './guards/auth.guard';
+import { IntegrationResultComponent } from './components/integration-result/integration-result.component';
 
 export const routes: Routes = [
     { path: "home", component: HomePageComponent },
     { path: "login", component: LoginPageComponent },
-    { path: "profile", component: ProfilePageComponent},
+    { path: "integration/result", component: IntegrationResultComponent },  // No AuthGuard
+    
+    { path: "profile", component: ProfilePageComponent, canActivate: [authGuard] },
     { path: "components", component: ComponentsPageComponent, canActivate: [authGuard] },
 
     // Wildcards and redirect routes
