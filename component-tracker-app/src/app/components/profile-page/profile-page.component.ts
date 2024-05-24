@@ -25,20 +25,6 @@ export class ProfilePageComponent implements OnInit{
   public rwgpsUser: any | null = null;
 
   ngOnInit(): void {
-    // check if this component is loaded in response to an integration result
-    // this.activeRoute.queryParamMap.subscribe(params => {
-    //   const result = params.get('result');
-    //   const provider = params.get('provider');
-    //   if (result) {
-    //     const appStateString = this.cookieService.get('appState');
-    //     const appState = JSON.parse(appStateString);
-    //     if (appState) {
-    //       console.log(`Restoring application state after integration. Result = ${result}, Provider = ${provider}`);
-    //       this.authService.accessToken = appState;
-    //     }
-    //   }
-    // });
-
     // Retrieve the currently logged in user
     this.authService.getCurrentUser().subscribe(data => {
       this.user = data;
@@ -75,8 +61,7 @@ export class ProfilePageComponent implements OnInit{
     const origin = window.location.origin;
     const successUrl = `${origin}/integration/result?provider=strava&result=success&return=profile`;
     const failureUrl = `${origin}/integration/result?provider=strava&result=failure&return=profile`;
-    const appState = JSON.stringify(this.authService.accessToken);
-    this.authService.integrateStrava(successUrl, failureUrl, appState).subscribe(data => {
+    this.authService.integrateStrava(successUrl, failureUrl).subscribe(data => {
       console.log('Starting Strava OAuth workflow');
       if (data.url) {
         window.location.href = data.url;
@@ -88,8 +73,7 @@ export class ProfilePageComponent implements OnInit{
     const origin = window.location.origin;
     const successUrl = `${origin}/integration/result?provider=rwgps&result=success&return=profile`;
     const failureUrl = `${origin}/integration/result?provider=rwgps&result=failure&return=profile`;
-    const appState = JSON.stringify(this.authService.accessToken);
-    this.authService.integrateRwgps(successUrl, failureUrl, appState).subscribe(data => {
+    this.authService.integrateRwgps(successUrl, failureUrl).subscribe(data => {
       console.log('Starting RWGPS OAuth workflow');
       if (data.url) {
         window.location.href = data.url;

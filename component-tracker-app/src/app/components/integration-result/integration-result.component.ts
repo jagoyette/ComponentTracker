@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class IntegrationResultComponent implements OnInit {
 
   constructor(private authService: AuthService, private router: Router,
-    private activeRoute: ActivatedRoute, private cookieService: CookieService) {}
+    private activeRoute: ActivatedRoute) {}
 
     ngOnInit(): void {
       // this component should be called upon completion of an OAuth
@@ -23,20 +23,7 @@ export class IntegrationResultComponent implements OnInit {
       // our own application state and re-route as desired.
 
       // Always try to restore our application state
-      try {
-        // Retrieve our state from the cookie
-        const appStateString = this.cookieService.get('appState');
-        this.cookieService.delete('appState');
-
-        // try to parse the state
-        const appState = JSON.parse(appStateString);
-        if (appState) {
-          console.log(`Restoring application state...`);
-          this.authService.accessToken = appState;
-        }
-      } catch (error) {
-        console.log('Unable to restore application state!');
-      }
+      this.authService.restoreApplicationState();
 
       // Inspect query parameters to determine how to redirect
       this.activeRoute.queryParamMap.subscribe(params => {
