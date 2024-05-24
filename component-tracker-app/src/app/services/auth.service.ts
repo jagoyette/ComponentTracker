@@ -27,9 +27,10 @@ export class AuthService {
     return !!(this.accessToken?.token);
   }
 
-  logout(): Observable<any> {
-    const url = this.baseUrl + 'auth/logout'
-    return this.http.post(url, null);
+  logout(): void {
+    // We do not need to make a server call because the API service is stateless
+    // Simply remove our access token, and we will be logged out
+    this.accessToken = this.user = null;
   }
 
   createGoogleLoginUrl(successPath: string, failurePath: string): string {

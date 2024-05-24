@@ -67,11 +67,8 @@ export class ProfilePageComponent implements OnInit{
   }
 
   logout(): void {
-    this.authService.logout().subscribe(result => {
-      if (result?.success) {
-        this.user = null;
-      }
-    });
+    this.authService.logout();
+    this.router.navigate(['home']);
   }
 
   integrateStrava(): void {
