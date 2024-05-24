@@ -9,7 +9,7 @@ import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
     { path: "home", component: HomePageComponent },
     { path: "login", component: LoginPageComponent },
-    { path: "profile", component: ProfilePageComponent, canActivate: [authGuard] },
+    { path: "profile", component: ProfilePageComponent},
     { path: "components", component: ComponentsPageComponent, canActivate: [authGuard] },
 
     // Wildcards and redirect routes

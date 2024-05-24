@@ -1,15 +1,19 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
 
 import { routes } from './app.routes';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { cookieAuthInterceptor } from './interceptors/cookie-auth.interceptor';
+import { jwtAuthInterceptor } from './interceptors/jwt-auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(withInterceptors([
-      cookieAuthInterceptor
+      cookieAuthInterceptor,
+      jwtAuthInterceptor
     ])),
+    CookieService
   ]
 };

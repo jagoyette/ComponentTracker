@@ -227,7 +227,7 @@ router.get('/strava/callback',
                         });
 
                         // Return the application state in a cookie
-                        res.cookie(appStateCookieName, appState, {maxAge: 30 * 60 * 1000});
+                        res.cookie(appStateCookieName, appState, {maxAge: 60 * 1000});
                    }
                 }
 
