@@ -122,9 +122,17 @@ router.get('/google/callback', (req, res, next) => {
 });
 
 router.get('/google/success', (req, res) => {
-    console.error('Google login success');
-    const access_token = JSON.parse(req.cookies['access_token']);
-    res.send(access_token);
+    console.error('Google login success');    
+    try {
+        const access_token = JSON.parse(req.cookies['access_token']);
+        res.cookie('access_token', '', {maxAge: 0});        // delete cookie
+        res.send(access_token);
+    } catch (error) {
+        res.send({
+            status: 200,
+            message: `Error encountered: ${error}`
+        });
+    }
 });
 
 router.get('/google/failure', (req, res) => {

@@ -22,7 +22,12 @@ export class LoginPageComponent implements OnInit {
       const result = params.get('result');
       if (result === 'success') {
         // successfully logged in
+        
+        // retrieve the access token cookie
         const access_token_str = this.cookieService.get('access_token');
+        this.cookieService.delete('access_token');
+        
+        // Parse the access token string
         const access_token = JSON.parse(access_token_str);
         if (access_token) {
           console.log('User login successful');

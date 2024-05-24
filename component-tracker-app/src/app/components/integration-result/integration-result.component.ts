@@ -24,7 +24,11 @@ export class IntegrationResultComponent implements OnInit {
 
       // Always try to restore our application state
       try {
+        // Retrieve our state from the cookie
         const appStateString = this.cookieService.get('appState');
+        this.cookieService.delete('appState');
+
+        // try to parse the state
         const appState = JSON.parse(appStateString);
         if (appState) {
           console.log(`Restoring application state...`);
