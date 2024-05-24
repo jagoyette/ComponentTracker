@@ -25,7 +25,7 @@ export class LoginPageComponent implements OnInit {
         const access_token_str = this.cookieService.get('access_token');
         const access_token = JSON.parse(access_token_str);
         if (access_token) {
-          console.log('We got an access token', access_token);
+          console.log('User login successful');
           this.authService.accessToken = access_token;
         }
         
