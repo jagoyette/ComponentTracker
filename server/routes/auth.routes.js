@@ -99,14 +99,14 @@ router.get('/google/callback', (req, res, next) => {
                 res.redirect(failureRedirect);
             } else {
                 // Successful login, generate access token
-                const expiresIn = ms('30m');
-                const token = jwtConfig.signingFunction(user._id, expiresIn);
+                const expiresInMs = ms('30m');
+                const token = jwtConfig.signingFunction(user._id, expiresInMs / 1000.0);
                 const refresh_token = jwtConfig.signingFunction(token, '5d', 'refresh');
 
                 // Add the access token to our response as a short lived cookie
                 const access_token = {
                     token: token,
-                    expires: new Date(Date.now() + expiresIn),
+                    expires: new Date(Date.now() + expiresInMs),
                     refresh_token: refresh_token
                 };
                 res.cookie('access_token', JSON.stringify(access_token), {maxAge: 60 * 1000});
