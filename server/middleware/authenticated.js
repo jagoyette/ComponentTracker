@@ -1,16 +1,7 @@
+const passport = require('passport');
+
 // middleware that checks that any valid user has been established with the current session
-const isAuthenticated = function(req, res, next) {
-    if (!req.isAuthenticated()) {
-        res.status(401).send({
-            error: {
-                code: 401,
-                message: 'Unauthenticated. No valid user is associated with the current session.'
-            }
-        });
-    } else {
-        next();
-    }
-}
+const isAuthenticated = passport.authenticate('jwt', { session: false });
 
 module.exports = {
     isAuthenticated

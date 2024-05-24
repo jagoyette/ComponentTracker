@@ -10,7 +10,6 @@ const app = require("./configs/express");
 // Initialize passport authentication
 const passport = require('./configs/passport');
 app.use(passport.initialize()); 
-app.use(passport.session()); 
 
 // Setup routes
 const authRoutes = require('./routes/auth.routes');
