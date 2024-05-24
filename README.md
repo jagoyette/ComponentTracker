@@ -53,7 +53,7 @@ The server app uses environment variables to store sensitive data. As a conviene
 
 There is a sample `.env` file checked into source called `.env.example`. Copy this file and rename it to `.env` and make sure it is present in the root of the `server` folder. Using the Client IDs and Client Secrets for the OAuth apps created, fill in the required environment variables. 
 
-For the `SESSION_SECRET` environment variable, you can create any random string.
+For the `MONGOOSE_SECRET` and `JWT_SECRET` environment variables, you can create any random string.
 
 Below is a copy of the example dotenv file:
 
@@ -62,7 +62,7 @@ PORT=3000
 CORS_ORIGINS='http://localhost:4200'
 CONNECTION_STRING=mongodb://localhost:27017/component-tracker
 MONGOOSE_SECRET=CREATE_A_RANDOM_STRING
-SESSION_SECRET=CREATE_A_RANDOM_STRING
+JWT_SECRET=CREATE_A_RANDOM_STRING
 GOOGLE_CLIENT_ID=YOUR_GOOGLE_APP_CLIENT_ID
 GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_APP_CLIENT_SECRET
 STRAVA_CLIENT_ID=YOUR_STAVA_APP_CLIENT_ID

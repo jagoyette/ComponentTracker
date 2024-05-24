@@ -22,6 +22,8 @@ export class HomePageComponent implements OnInit {
     this.authService.getCurrentUser().subscribe(data => {
       this.user = data;
       console.log('Current user', this.user);
+    }, error => {
+      console.log('Not logged in');
     });
   }
 }

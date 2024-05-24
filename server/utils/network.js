@@ -24,7 +24,7 @@ const originalURL = function(req, options) {
         , tls = req.connection.encrypted || (trustProxy && 'https' == proto.split(/\s*,\s*/)[0])
         , host = (trustProxy && req.headers['x-forwarded-host']) || req.headers.host
         , protocol = tls ? 'https' : 'http'
-        , path = req.url || '';
+        , path = req.baseUrl + (req.url || '');
     return protocol + '://' + host + path;
 };
   
