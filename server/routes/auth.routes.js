@@ -206,31 +206,36 @@ router.get('/strava/callback',
         const client_id = process.env.STRAVA_CLIENT_ID;
         const client_secret = process.env.STRAVA_CLIENT_SECRET;
 
-        if (code) {
-            try {     
-                // Lookup the user from our AppState
-                let userId = undefined;
-                let appState = undefined;
-                let appStateCookieName = 'appState';
+        let userId = undefined;
+        try {     
+            // Lookup the user from our AppState and populate a cookie with app state
+            let appState = undefined;
+            let appStateCookieName = 'appState';
 
-                const { appStateId } = JSON.parse(state);
-                if (appStateId) {
-                    const appStateModel = await AppState.findById(appStateId);
-                    if (appStateModel) {
-                        userId = appStateModel.userId;
-                        appState = appStateModel.appState;
-                        appStateCookieName = appStateModel.appStateCookieName;
+            const { appStateId } = JSON.parse(state);
+            if (appStateId) {
+                const appStateModel = await AppState.findById(appStateId);
+                if (appStateModel) {
+                    userId = appStateModel.userId;
+                    appState = appStateModel.appState;
+                    appStateCookieName = appStateModel.appStateCookieName;
 
-                        // delete this state from db
-                        appStateModel.deleteOne().then(result => {
-                            console.log('Deleted app state');
-                        });
+                    // delete this state from db
+                    appStateModel.deleteOne().then(result => {
+                        console.log('Deleted app state');
+                    });
 
-                        // Return the application state in a cookie
-                        res.cookie(appStateCookieName, appState, {maxAge: 60 * 1000});
-                   }
+                    // Return the application state in a cookie
+                    res.cookie(appStateCookieName, appState, {maxAge: 60 * 1000});
                 }
+            }
+        } catch (error) {
+            console.log(`Error restoring application state`, error);
+        }            
 
+            // If successful, get token and athlete info
+        if (code) {
+            try {
                 if (!userId) {
                     console.error('Cannot integrate Strava without signing in');
                     // Resolve the desired Url and redirect response
@@ -283,7 +288,7 @@ router.get('/strava/success', (req, res) => {
 });
 
 router.get('/strava/failure', (req, res) => {
-    console.error('Strava integration failed');
+    console.info('Strava integration failed');
     res.send('Strava integration failed');
 });
 
@@ -354,31 +359,35 @@ router.get('/rwgps/callback',
         const client_id = process.env.RWGPS_CLIENT_ID;
         const client_secret = process.env.RWGPS_CLIENT_SECRET;
 
+        let userId = undefined;
+        try {
+            // Lookup the user from our AppState
+            let appState = undefined;
+            let appStateCookieName = 'appState';
+
+            const { appStateId } = JSON.parse(state);
+            if (appStateId) {
+                const appStateModel = await AppState.findById(appStateId);
+                if (appStateModel) {
+                    userId = appStateModel.userId;
+                    appState = appStateModel.appState;
+                    appStateCookieName = appStateModel.appStateCookieName;
+
+                    // delete this state from db
+                    appStateModel.deleteOne().then(result => {
+                        console.log('Deleted app state');
+                    });
+
+                    // Return the application state in a cookie
+                    res.cookie(appStateCookieName, appState, {maxAge: 10 * 1000});
+               }
+            }
+        } catch (error) {
+            console.log(`Error restoring application state`, error);
+        }
+
         if (code) {
             try {
-                // Lookup the user from our AppState
-                let userId = undefined;
-                let appState = undefined;
-                let appStateCookieName = 'appState';
-
-                const { appStateId } = JSON.parse(state);
-                if (appStateId) {
-                    const appStateModel = await AppState.findById(appStateId);
-                    if (appStateModel) {
-                        userId = appStateModel.userId;
-                        appState = appStateModel.appState;
-                        appStateCookieName = appStateModel.appStateCookieName;
-
-                        // delete this state from db
-                        appStateModel.deleteOne().then(result => {
-                            console.log('Deleted app state');
-                        });
-
-                        // Return the application state in a cookie
-                        res.cookie(appStateCookieName, appState, {maxAge: 10 * 1000});
-                   }
-                }
-
                 // Make sure we have a valid user
                 if (!userId) {
                     console.error('Cannot integrate RWGPS without signing in');
@@ -425,8 +434,8 @@ router.get('/rwgps/callback',
                 return;
 
             } catch (error) {
-                console.log(`Error getting token`, error);
-                console.log(error.response.data);
+                console.log(`Error processing RWGPS callback`, error);
+                console.log(error?.response?.data);
             }
         }
 
@@ -437,12 +446,12 @@ router.get('/rwgps/callback',
 );
 
 router.get('/rwgps/success', (req, res) => {
-    console.error('RWGPS integration succeeded');
-    res.send('Success');
+    console.info('RWGPS integration succeeded');
+    res.send('RWGPS integration success');
 });
 
 router.get('/rwgps/failure', (req, res) => {
-    console.error('RWGPS integration failed');
+    console.info('RWGPS integration failed');
     res.send('RWGPS integration failed');
 });
 
