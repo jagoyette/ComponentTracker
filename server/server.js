@@ -27,9 +27,50 @@ app.use('/rwgps', rwgpsRoutes);
 const compRoutes = require('./routes/component.routes');
 app.use('/component', compRoutes);
 
+const path = require('path');
+//////////////////////////////////////////////////////////
+// Swagger
+
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express"); 
+
+// ------ Configure swagger docs ------
+const swaggerSpecsJsDoc = swaggerJsdoc({
+    definition: {
+        openapi: "3.0.1",
+        info: {
+            title: "Component Tracker",
+            description: "Backend API for Component Tracker.",
+            version: "1.0.0",
+            contact: {
+                emai: "jagoyette@gmail.com"
+            }
+        },
+        servers: [{
+            "url": "http://localhost:3000/"
+        }],
+        components: {
+            securitySchemes: {
+                jwt: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
+                }
+            }
+        },
+        security: [{
+            jwt: []
+        }],
+    },
+    apis: [path.join(__dirname, "./routes/*.js")],
+});
+
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpecsJsDoc));
+
+//////////////////////////////////////////////////////////
+
 // Serve the Angular app from our 'public' folder
 const express = require('express');
-const path = require('path');
 const publicPath = path.join(__dirname, 'public')
 app.use(express.static(publicPath))
 app.use('/*', express.static(publicPath))
