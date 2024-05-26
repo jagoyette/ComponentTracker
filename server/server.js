@@ -1,5 +1,6 @@
 // Read .env file before any other module
 require("dotenv").config();
+const path = require('path');
 
 // Configure database
 const mongoose = require("./configs/mongoose");
@@ -27,47 +28,10 @@ app.use('/rwgps', rwgpsRoutes);
 const compRoutes = require('./routes/component.routes');
 app.use('/component', compRoutes);
 
-const path = require('path');
-//////////////////////////////////////////////////////////
-// Swagger
-
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express"); 
-
-// ------ Configure swagger docs ------
-const swaggerSpecsJsDoc = swaggerJsdoc({
-    definition: {
-        openapi: "3.0.1",
-        info: {
-            title: "Component Tracker",
-            description: "Backend API for Component Tracker.",
-            version: "1.0.0",
-            contact: {
-                emai: "jagoyette@gmail.com"
-            }
-        },
-        servers: [{
-            "url": "http://localhost:3000/"
-        }],
-        components: {
-            securitySchemes: {
-                jwt: {
-                    type: "http",
-                    scheme: "bearer",
-                    bearerFormat: "JWT"
-                }
-            }
-        },
-        security: [{
-            jwt: []
-        }],
-    },
-    apis: [path.join(__dirname, "./routes/*.js")],
-});
-
-app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpecsJsDoc));
-
-//////////////////////////////////////////////////////////
+// Setup Swagger API documentation end point
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecs = require("./configs/swagger");
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Serve the Angular app from our 'public' folder
 const express = require('express');
