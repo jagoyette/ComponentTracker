@@ -8,13 +8,9 @@ const swaggerSpecs = swaggerJsdoc({
         info: {
             title: "Component Tracker",
             description: `Backend API for Component Tracker.
-            Obtain a JWT authorizatrion token by logging into the app at
-            http://localhost:3000/auth/google/login
+            Obtain a JWT authorization token by logging into the app at /auth/google/login
             `,
             version: "1.0.0",
-            contact: {
-                emai: "jagoyette@gmail.com"
-            }
         },
         servers: [{
             "url": "http://localhost:3000/"
