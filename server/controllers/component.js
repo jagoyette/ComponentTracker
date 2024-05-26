@@ -16,7 +16,7 @@ class ComponentEventDto {
     }
 };
 
-class ComponentServiceDto {
+class ServiceIntervalDto {
     constructor(model) {
         this.id = model.id;
         this.name = model.name;
@@ -44,7 +44,7 @@ class ComponentDto {
         this.eventHistory = model.eventHistory?.length > 0 ?
             model.eventHistory?.map(v => v ? new ComponentEventDto(v) : null) : [];
         this.serviceIntervals = model.serviceIntervals?.length > 0 ?
-            model.serviceIntervals?.map(v => v ? new ComponentServiceDto(v) : null) : [];
+            model.serviceIntervals?.map(v => v ? new ServiceIntervalDto(v) : null) : [];
 
         // Compute totals from event history
         this.totalDistance = model.eventHistory?.reduce( (acc, cur) => acc + (cur?.distance ?? 0), 0);
@@ -385,18 +385,18 @@ const synchronizeComponentRides = async function(userId, componentId) {
  * 
  * @param userId            The id of the current user
  * @param componentId       The Id of the component
- * @param componentServiceDto The service interval to add 
+ * @param serviceIntervalDto The service interval to add 
  * 
  * @returns {Promise<ComponentDto>} Returns an object containing the component with
  * newly added service interval.
  **/
-const addComponentService = async function(userId, componentId, componentServiceDto) {
+const addComponentService = async function(userId, componentId, serviceIntervalDto) {
     try {
         const componentModel = await ComponentModel.findOneAndUpdate({
             userId: userId,
             _id: componentId
         }, { 
-            $push: { serviceIntervals: componentServiceDto } 
+            $push: { serviceIntervals: serviceIntervalDto } 
         }, {
             new: true
         });
@@ -415,7 +415,7 @@ const addComponentService = async function(userId, componentId, componentService
  * @param componentId       The Id of the component
  * @param componentServiceId  The Id of the service interval
  * 
- * @returns {Promise<ComponentServiceDto>} Returns an object containing the service interval
+ * @returns {Promise<ServiceIntervalDto>} Returns an object containing the service interval
  **/
 const getComponentService = async function(userId, componentId, componentServiceId) {
     try {
@@ -431,7 +431,7 @@ const getComponentService = async function(userId, componentId, componentService
             return null;
         }
 
-        return new ComponentServiceDto(service);
+        return new ServiceIntervalDto(service);
     } catch (error) {
         console.log('Error retrieving component service interval', error);
         return null;
@@ -444,11 +444,11 @@ const getComponentService = async function(userId, componentId, componentService
  * @param userId            The Id of the current user
  * @param componentId       The Id of the component
  * @param componentServiceId  The Id of the service interval
- * @param componentServiceDto The service interval data to update
+ * @param serviceIntervalDto The service interval data to update
  * 
- * @returns {Promise<ComponentServiceDto>} Returns an object containing the updated service interval
+ * @returns {Promise<ServiceIntervalDto>} Returns an object containing the updated service interval
  **/
-const updateComponentService = async function(userId, componentId, componentServiceId, componentServiceDto) {
+const updateComponentService = async function(userId, componentId, componentServiceId, serviceIntervalDto) {
     try {
         // First retreive this component
         const componentModel = await ComponentModel.findOne({
@@ -462,10 +462,10 @@ const updateComponentService = async function(userId, componentId, componentServ
             return null;
         }
 
-        service = componentServiceDto;
+        service = serviceIntervalDto;
         await componentModel.save();
 
-        return new ComponentServiceDto(service);
+        return new ServiceIntervalDto(service);
     } catch (error) {
         console.log('Error updating component service interval', error);
         return null;
@@ -479,7 +479,7 @@ const updateComponentService = async function(userId, componentId, componentServ
  * @param componentId       The Id of the component
  * @param componentServiceId  The Id of the service interval
  * 
- * @returns {Promise<ComponentServiceDto>} Returns an object containing the service interval removed
+ * @returns {Promise<ServiceIntervalDto>} Returns an object containing the service interval removed
  **/
 const removeComponentService = async function(userId, componentId, componentServiceId) {
     try {
@@ -494,7 +494,7 @@ const removeComponentService = async function(userId, componentId, componentServ
 
         // Return the service interval
         const service = componentModel?.serviceIntervals?.find(e => e.id === componentServiceId);
-        return !service ? null : new ComponentServiceDto(service);
+        return !service ? null : new ServiceIntervalDto(service);
     } catch (error) {
         console.log('Error removing component service interval', error);
         return null;
@@ -505,7 +505,7 @@ const removeComponentService = async function(userId, componentId, componentServ
 module.exports = {
     ComponentDto,
     ComponentEventDto,
-    ComponentServiceDto,
+    ServiceIntervalDto,
 
     getComponentsForUser,
     getComponentById,

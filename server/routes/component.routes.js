@@ -749,7 +749,7 @@ router.delete('/:componentId/event/:componentEventId', isAuthenticated, async (r
 router.post('/:componentId/service', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId } = req.params;
-    const componentService = new ComponentController.ComponentServiceDto(req.body);
+    const componentService = new ComponentController.ServiceIntervalDto(req.body);
 
     const service = await ComponentController.addComponentService(userId, componentId, componentService);
     if (!service) {
@@ -877,7 +877,7 @@ router.get('/:componentId/service/:componentServiceId', isAuthenticated, async (
 router.put('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentServiceId } = req.params;
-    const serviceDto = new ComponentController.ComponentServiceDto(req.body);
+    const serviceDto = new ComponentController.ServiceIntervalDto(req.body);
 
     const service = await ComponentController.updateComponentService(userId, componentId, componentServiceId, serviceDto);
     if (!service) {
