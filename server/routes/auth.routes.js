@@ -16,7 +16,50 @@ const RwgpsToken = require("../models/rwgps.token");
 
 const router = express.Router();
 
-// Returns current user if logged in
+/**
+ * @swagger
+ *
+ * /auth/user:
+ *   get:
+ *     tags:
+ *     - Auth
+ *     summary: Get Current User
+ *     description: Returns the currently authenticated user
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Current User Information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                   description: The user's unique identifier.
+ *                   example: "109876543212345678901"
+ *                 id:
+ *                   type: string
+ *                   description: The user's Id in the third party user authentication provider.
+ *                   example: "1234567890987654321"
+ *                 provider:
+ *                   type: string
+ *                   description: The name of the third party user authentication provider.
+ *                   example: "google"
+ *                 name:
+ *                   type: string
+ *                   description: The user's full name.
+ *                   example: "John Doe"
+ *                 email:
+ *                   type: string
+ *                   description: The user's email.
+ *                   example: "john.doe@acme.com" 
+ *
+ *       401:
+ *         description: Unauthorized
+ *
+ */
 router.get('/user',
     passport.authenticate('jwt', { session: false }),
     async (req, res) => {
@@ -37,7 +80,7 @@ function encodeStateRedirects(req, defaultSuccess, defaultFailure) {
     // Make sure redirects have sane defaults
     successRedirect = successRedirect || defaultSuccess;
     failureRedirect = failureRedirect || defaultFailure;
-    
+
     // Return JSON string representing our state
     return JSON.stringify({ successRedirect, failureRedirect });
 }
@@ -122,7 +165,7 @@ router.get('/google/callback', (req, res, next) => {
 });
 
 router.get('/google/success', (req, res) => {
-    console.error('Google login success');    
+    console.error('Google login success');
     try {
         const access_token = JSON.parse(req.cookies['access_token']);
         res.cookie('access_token', '', {maxAge: 0});        // delete cookie
@@ -166,7 +209,7 @@ router.post('/strava/integrate',
         const failureRedirect = req.body?.failureRedirect || '../strava/failure';
         const appStateCookieName = req.body?.appStateCookieName || 'appState';
         const { appState } = req.body;
-        
+
         // Save application state if supplied
         let appStateModel = undefined;
         if (appState) {
@@ -215,7 +258,7 @@ router.get('/strava/callback',
         const client_secret = process.env.STRAVA_CLIENT_SECRET;
 
         let userId = undefined;
-        try {     
+        try {
             // Lookup the user from our AppState and populate a cookie with app state
             let appState = undefined;
             let appStateCookieName = 'appState';
@@ -239,7 +282,7 @@ router.get('/strava/callback',
             }
         } catch (error) {
             console.log(`Error restoring application state`, error);
-        }            
+        }
 
             // If successful, get token and athlete info
         if (code) {
@@ -321,7 +364,7 @@ router.post('/rwgps/integrate',
         const failureRedirect = req.body?.failureRedirect || '../rwgps/failure';
         const appStateCookieName = req.body?.appStateCookieName || 'appState';
         const { appState } = req.body;
-        
+
         // Save application state if supplied
         let appStateModel = undefined;
         if (appState) {
@@ -358,7 +401,7 @@ router.post('/rwgps/integrate',
 // Callback (redirect_uri) called by RWGPS Oauth
 // If the user approved the integration, we will have and authorization
 // code in the query params of this request url
-router.get('/rwgps/callback', 
+router.get('/rwgps/callback',
     async function (req, res, next) {
         // extract the authorization code
         const { code, state, scope }= req.query;
