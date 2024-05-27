@@ -71,7 +71,7 @@ const router = express.Router();
  *        description: Unauthorized
  * 
  */
-router.get('/athlete', isAuthenticated, async (req, res) => {
+router.get('/rwgps/athlete', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const athlete = await RwgpsController.getAthleteByUserId(userId);
     if (!athlete) {
@@ -113,7 +113,7 @@ router.get('/athlete', isAuthenticated, async (req, res) => {
  *        description: Unauthorized
  * 
  */
-router.delete('/athlete', isAuthenticated, async (req, res) => {
+router.delete('/rwgps/athlete', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
 
     try {
@@ -161,7 +161,7 @@ router.delete('/athlete', isAuthenticated, async (req, res) => {
  *        description: Unauthorized
  * 
  */
-router.post('/synchronize', isAuthenticated, async (req, res) => {
+router.post('/rwgps/synchronize', isAuthenticated, async (req, res) => {
     // First make sure we have a valid Strava user
     const userId = req.user.userId;
     const athlete = await RwgpsController.getAthleteByUserId(userId);

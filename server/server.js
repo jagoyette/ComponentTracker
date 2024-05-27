@@ -16,17 +16,12 @@ app.use(passport.initialize());
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
+// API Routes
 const rideRoutes = require('./routes/ride.routes');
-app.use('/ride', rideRoutes);
-
 const stravaRoutes = require('./routes/strava.routes');
-app.use('/strava', stravaRoutes);
-
 const rwgpsRoutes = require('./routes/rwgps.routes');
-app.use('/rwgps', rwgpsRoutes);
-
 const compRoutes = require('./routes/component.routes');
-app.use('/component', compRoutes);
+app.use('/', [rideRoutes, stravaRoutes, rwgpsRoutes, compRoutes]);
 
 // Setup Swagger API documentation end point
 const swaggerUi = require("swagger-ui-express");

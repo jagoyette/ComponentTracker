@@ -37,7 +37,7 @@ const router = express.Router();
  *        description: Unauthorized
  * 
  */
-router.get('/statistics', isAuthenticated, async (req, res) => {
+router.get('/ride/statistics', isAuthenticated, async (req, res) => {
     const stats = await RideController.getAthleteStats(req.user.userId);
     res.send(stats);
 });

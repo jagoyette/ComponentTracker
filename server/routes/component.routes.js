@@ -144,7 +144,7 @@ const router = express.Router();
  *        description: Unauthorized
  *  
  */
-router.get('/', isAuthenticated, async (req, res) => {
+router.get('/component/', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const components = await ComponentController.getComponentsForUser(userId);
     res.send(components);
@@ -204,7 +204,7 @@ router.get('/', isAuthenticated, async (req, res) => {
  *        description: Unauthorized
  *  
  */
-router.post('/', isAuthenticated, async (req, res) => {
+router.post('/component/', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const componentData = new ComponentController.ComponentDto(req.body);
 
@@ -245,7 +245,7 @@ router.post('/', isAuthenticated, async (req, res) => {
  *        description: The component Id was not found
  *
  */
-router.get('/:componentId', isAuthenticated, async (req, res) => {
+router.get('/component/:componentId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const componentId = req.params.componentId;
     const component = await ComponentController.getComponentById(userId, componentId);
@@ -323,7 +323,7 @@ router.get('/:componentId', isAuthenticated, async (req, res) => {
  *        description: The component Id was not found
  *
  */
-router.put('/:componentId', isAuthenticated, async (req, res) => {
+router.put('/component/:componentId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const componentId = req.params.componentId;
     const componentModel = new ComponentController.ComponentDto(req.body);
@@ -371,7 +371,7 @@ router.put('/:componentId', isAuthenticated, async (req, res) => {
  *        description: The component Id was not found
  *
  */
-router.delete('/:componentId', isAuthenticated, async (req, res) => {
+router.delete('/component/:componentId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const componentId = req.params.componentId;
     const component = await ComponentController.deleteComponent(userId, componentId);
@@ -418,7 +418,7 @@ router.delete('/:componentId', isAuthenticated, async (req, res) => {
  *        description: The component Id was not found
  *
  */
-router.post('/:componentId/sync', isAuthenticated, async (req, res) => {
+router.post('/component/:componentId/sync', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId } = req.params;
     
@@ -492,7 +492,7 @@ router.post('/:componentId/sync', isAuthenticated, async (req, res) => {
  *        description: Unauthorized
  *  
  */
-router.post('/:componentId/event', isAuthenticated, async (req, res) => {
+router.post('/component/:componentId/event', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId } = req.params;
     const componentEvent = new ComponentController.ComponentEventDto(req.body);
@@ -545,7 +545,7 @@ router.post('/:componentId/event', isAuthenticated, async (req, res) => {
  *        description: Unauthorized
  *  
  */
-router.get('/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
+router.get('/component/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentEventId } = req.params;
 
@@ -624,7 +624,7 @@ router.get('/:componentId/event/:componentEventId', isAuthenticated, async (req,
  *        description: Unauthorized
  *  
  */
-router.put('/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
+router.put('/component/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentEventId } = req.params;
     const eventDto = new ComponentController.ComponentEventDto(req.body);
@@ -677,7 +677,7 @@ router.put('/:componentId/event/:componentEventId', isAuthenticated, async (req,
  *        description: Unauthorized
  *  
  */
-router.delete('/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
+router.delete('/component/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentEventId } = req.params;
 
@@ -746,7 +746,7 @@ router.delete('/:componentId/event/:componentEventId', isAuthenticated, async (r
  *        description: Unauthorized
  *  
  */
-router.post('/:componentId/service', isAuthenticated, async (req, res) => {
+router.post('/component/:componentId/service', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId } = req.params;
     const componentService = new ComponentController.ServiceIntervalDto(req.body);
@@ -799,7 +799,7 @@ router.post('/:componentId/service', isAuthenticated, async (req, res) => {
  *        description: Unauthorized
  *  
  */
-router.get('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
+router.get('/component/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentServiceId } = req.params;
 
@@ -874,7 +874,7 @@ router.get('/:componentId/service/:componentServiceId', isAuthenticated, async (
  *        description: Unauthorized
  *  
  */
-router.put('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
+router.put('/component/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentServiceId } = req.params;
     const serviceDto = new ComponentController.ServiceIntervalDto(req.body);
@@ -927,7 +927,7 @@ router.put('/:componentId/service/:componentServiceId', isAuthenticated, async (
  *        description: Unauthorized
  *  
  */
-router.delete('/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
+router.delete('/component/:componentId/service/:componentServiceId', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const { componentId, componentServiceId } = req.params;
 
