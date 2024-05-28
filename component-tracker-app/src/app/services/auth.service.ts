@@ -18,14 +18,14 @@ export class AuthService {
   public accessToken: AccessToken | null | undefined;
 
   // Application State Tracking for OAuth integrations
-  private APP_STATE_COOKIE_NAME = 'ctas';
+  public readonly APP_STATE_COOKIE_NAME = 'ctas';
   
   /**
    * Creates an string representing our current authentication state.
    * Intended to be encoded in our local AppState database and restored
    * when the OAuth workflow completes.
    */
-  private createApplicationState(): string {
+  public createApplicationState(): string {
     if (!this.isLoggedIn()) {
       return '';
     }
@@ -94,58 +94,6 @@ export class AuthService {
     const successUrl = `${origin}${successPath}`;
     const failureUrl = `${origin}${failurePath}`;
     return`${this.baseUrl}auth/google/login?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
-  }
-
-  /**
-   * Integrate the current user with Strava.
-   * The opbject returned will contain a property called `url`. This URl should be loaded into
-   * the user's browser window to initiate an OAuth workflow. The user may be required to interact 
-   * and authorize the application. The OAuth worlfow concludes be redirecting the browser to
-   * either the `successRedirect` or the `failureRedirect` urls supplied.
-   * 
-   * If the workflow was conducted in the same window (tab) as the current application, then
-   * current user authentication info may be lost. You may restore the application state by calling
-   * this service's api: `restoreApplicationState()`, ideally, from both of the supplied redirect URLs.
-   * 
-   * @param {string} successRedirect  The URL to redirect to following successful login
-   * @param {string} failureRedirect  The URL to redirect to following unsuccessful login
-   * @returns {object}                An object representing the integration info. 
-   * The `url` property contains the URL that should be loaded into a browser window to initiate OAuth workflow.
-   */
-  integrateStrava(successRedirect: string, failureRedirect: string): Observable<any> {
-    const url = this.baseUrl + 'auth/strava/integrate';
-    return this.http.post(url, {
-      successRedirect,
-      failureRedirect,
-      appState: this.createApplicationState(),
-      appStateCookieName: this.APP_STATE_COOKIE_NAME,
-    });
-  }
-
-  /**
-   * Integrate the current user with Ride with GPS.
-   * The opbject returned will contain a property called `url`. This URl should be loaded into
-   * the user's browser window to initiate an OAuth workflow. The user may be required to interact 
-   * and authorize the application. The OAuth worlfow concludes be redirecting the browser to
-   * either the `successRedirect` or the `failureRedirect` urls supplied.
-   * 
-   * If the workflow was conducted in the same window (tab) as the current application, then
-   * current user authentication info may be lost. You may restore the application state by calling
-   * this service's api: `restoreApplicationState()`, ideally, from both of the supplied redirect URLs.
-   * 
-   * @param {string} successRedirect  The URL to redirect to following successful login
-   * @param {string} failureRedirect  The URL to redirect to following unsuccessful login
-   * @returns {object}                An object representing the integration info. 
-   * The `url` property contains the URL that should be loaded into a browser window to initiate OAuth workflow.
-   */
-  integrateRwgps(successRedirect: string, failureRedirect: string): Observable<any> {
-    const url = this.baseUrl + 'auth/rwgps/integrate';
-    return this.http.post(url, {
-      successRedirect,
-      failureRedirect,
-      appState : this.createApplicationState(),
-      appStateCookieName: this.APP_STATE_COOKIE_NAME
-    });
   }
 
 }
