@@ -6,8 +6,73 @@ const ComponentController = require('../controllers/component');
 
 const router = express.Router();
 
-// Retrieve info about Strava athlete
-router.get('/athlete', isAuthenticated, async (req, res) => {
+/**
+ * @swagger
+ * 
+ * /strava/athlete:
+ *    get:
+ *     summary: Get Strava Athlete
+ *     description: Get's the user's Ride With GPS athlete profile
+ *     tags:
+ *     - Strava
+ *    produces:
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: A Strava Athlete
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                userId:
+ *                  type: string
+ *                  description: The user Id this athlete profile belongs to
+ *                id:
+ *                  type: string
+ *                  description: The athlete's user Id in Strava
+ *                firstName:
+ *                  type: string
+ *                  description: Athlete's first name
+ *                lastName:
+ *                  type: string
+ *                  description: Athlete's last name
+ *                profileMedium:
+ *                  type: string
+ *                  description: Athlete's profile picture (medium)
+ *                profile:
+ *                  type: string
+ *                  description: Athlete's profile picture
+ *                city:
+ *                  type: string
+ *                  description: Athlete's city
+ *                state:
+ *                  type: string
+ *                  description: Athlete's state
+ *                country:
+ *                  type: string
+ *                  description: Athlete's country
+ *                sex:
+ *                  type: string
+ *                  description: Athlete's sex 
+ *                summit:
+ *                  type: boolean
+ *                  description: True if athlete has subscription (Summit)
+ *                createdAt:
+ *                  type: string
+ *                  format: date
+ *                  description: Date profile was created
+ *                updatedAt:
+ *                  type: string
+ *                  format: date
+ *                  description: Date profile was last updated
+ *      404:
+ *        description: Strava Athlete Not Found
+ *      401:
+ *        description: Unauthorized
+ * 
+ */
+router.get('/strava/athlete', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
     const athlete = await StravaController.getAthleteByUserId(userId);
     if (!athlete) {
@@ -22,8 +87,34 @@ router.get('/athlete', isAuthenticated, async (req, res) => {
     }
 });
 
-// Delete Strava Integration
-router.delete('/athlete', isAuthenticated, async (req, res) => {
+/**
+ * @swagger
+ * 
+ * /stava/athlete:
+ *    delete:
+ *     summary: Delete Strava Athlete
+ *     description: Delete's (Unauthorizes) the connection to Strava for the current user.
+ *     tags:
+ *     - Strava
+ *    produces:
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: A Strava Athlete
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                status:
+ *                  type: string
+ *                  description: Status result is `Success` or `Error`
+ * 
+ *      401:
+ *        description: Unauthorized
+ * 
+ */
+router.delete('/strava/athlete', isAuthenticated, async (req, res) => {
     const userId = req.user.userId;
 
     try {
@@ -44,7 +135,35 @@ router.delete('/athlete', isAuthenticated, async (req, res) => {
     }
 });
 
-router.post('/synchronize', isAuthenticated, async (req, res) => {
+/**
+ * @swagger
+ * 
+ * /strava/synchronize:
+ *    post:
+ *     summary: Synchronize Strava Rides
+ *     description: Retrieves all Strava rides for athlete and synchronizes with user rides
+ *     tags:
+ *     - Strava
+ *    produces:
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: Background synchronization has started
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                result:
+ *                  type: string
+ *                  description: Message indicating sync started
+ *      404:
+ *        description: Strava Athlete Not Found      
+ *      401:
+ *        description: Unauthorized
+ * 
+ */
+router.post('/strava/synchronize', isAuthenticated, async (req, res) => {
     // First make sure we have a valid Strava user
     const userId = req.user.userId;
     const athlete = await StravaController.getAthleteByUserId(userId);

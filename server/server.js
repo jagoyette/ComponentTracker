@@ -1,5 +1,6 @@
 // Read .env file before any other module
 require("dotenv").config();
+const path = require('path');
 
 // Configure database
 const mongoose = require("./configs/mongoose");
@@ -15,21 +16,20 @@ app.use(passport.initialize());
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
+// API Routes
 const rideRoutes = require('./routes/ride.routes');
-app.use('/ride', rideRoutes);
-
 const stravaRoutes = require('./routes/strava.routes');
-app.use('/strava', stravaRoutes);
-
 const rwgpsRoutes = require('./routes/rwgps.routes');
-app.use('/rwgps', rwgpsRoutes);
-
 const compRoutes = require('./routes/component.routes');
-app.use('/component', compRoutes);
+app.use('/', [rideRoutes, stravaRoutes, rwgpsRoutes, compRoutes]);
+
+// Setup Swagger API documentation end point
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecs = require("./configs/swagger");
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Serve the Angular app from our 'public' folder
 const express = require('express');
-const path = require('path');
 const publicPath = path.join(__dirname, 'public')
 app.use(express.static(publicPath))
 app.use('/*', express.static(publicPath))
