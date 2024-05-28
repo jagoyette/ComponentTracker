@@ -46,16 +46,14 @@ const router = express.Router();
  *           type: string
  *           format: date-time
  *           description: The timestamp that the component was removed from a bike
- *         eventHistory:
- *           description: A list of events (rides) associated with this component
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/ComponentEvent'
  *         serviceIntervals:
  *           description: A list of service intervals affecting this component
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/ServiceInterval'
+ *         totalRides:
+ *           type: number
+ *           description: The total number of rides this component has accumulated
  *         totalDistance:
  *           type: number
  *           description: The total distance in meters this component has accumulated
@@ -63,37 +61,6 @@ const router = express.Router();
  *           type: number
  *           description: The total time in seconds this component has accumulated
  * 
- *     ComponentEvent:
- *       description: Describes an event associated with a component. For example, a ride adds mileage and usage to a component.
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           description: The Event ID.
- *         eventType:
- *           type: string
- *           description: |
- *             The type of event as one of the following:
- *                * `ride` - This event data is from a ride
- *                * `initial` - This event data is from the initial component creation.
- *                * `manual` - Event data is entered manually
- *         eventDate:
- *           type: string
- *           format: date-time
- *           description: Timestamp of event
- *         description:
- *           type: string
- *           description: Description of event
- *         rideId:
- *           type: string
- *           description: Associated Ride Id (only applies when eventType is `ride`)
- *         distance:
- *           type: number
- *           description: The distance in meters associated with the event   
- *         time:
- *           type: number
- *           description: The duration in seconds associated with the event
- *
  *     ServiceInterval:
  *       description: Describes a service interval for a bike or component. For example, a "Maximum Life" service interval may be triggered when a component life reaches a certain distance or usage time.
  *       type: object
@@ -393,7 +360,7 @@ router.delete('/component/:componentId', isAuthenticated, async (req, res) => {
  * /component/{componentId}/sync:
  *  post:
  *    summary: Synchronize a component
- *    description: Updates the component's `eventHistory` based on current rides
+ *    description: Updates the component's statistics based on current rides
  *    tags:
  *    - Components
  *    parameters:
@@ -432,265 +399,6 @@ router.post('/component/:componentId/sync', isAuthenticated, async (req, res) =>
         });
     } else {
         res.send(component);
-    }
-});
-
-
-/**
- * @swagger
- * 
- * /component/{componentId}/event:
- *  post:
- *    summary: Add a Component Event
- *    description: Adds a new event to the component's `eventHistory`.
- *    tags:
- *    - Components
- *    parameters:
- *      - in: path
- *        name: componentId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component
- *    requestBody:
- *      description: The component event to create
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              eventType:
- *                type: string
- *                description: The type of event, for example, `ride` or `manual`.
- *              eventDate:
- *                type: string
- *                format: date-time
- *                description: Timestamp of the event
- *              description:
- *                type: string
- *                description: Description of the event
- *              rideId:
- *                type: string
- *                description: The Id of an associated ride if the eventType is `ride`
- *              distance:
- *                type: number
- *                description: The distance in meters associated with the event
- *              time:
- *                type: number
- *                description: The duration in seconds associated with the event
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: The newly added component event
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/ComponentEvent'
- *      401:
- *        description: Unauthorized
- *  
- */
-router.post('/component/:componentId/event', isAuthenticated, async (req, res) => {
-    const userId = req.user.userId;
-    const { componentId } = req.params;
-    const componentEvent = new ComponentController.ComponentEventDto(req.body);
-
-    const event = await ComponentController.addComponentEvent(userId, componentId, componentEvent);
-    if (!event) {
-        res.status(404).send({
-            error: {
-                status: 'Not Found',
-                message: 'No component with Id: ' + componentId + ' was found.'
-            }
-        });        
-    } else {
-        res.send(event);
-    }
-});
-
-/**
- * @swagger
- * 
- * /component/{componentId}/event/{componentEventId}:
- *  get:
- *    summary: Get a Component Event
- *    description: Retrieves a specific component event
- *    tags:
- *    - Components
- *    parameters:
- *      - in: path
- *        name: componentId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component
- *      - in: path
- *        name: componentEventId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component event
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: The component event
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/ComponentEvent'
- *      401:
- *        description: Unauthorized
- *  
- */
-router.get('/component/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
-    const userId = req.user.userId;
-    const { componentId, componentEventId } = req.params;
-
-    const event = await ComponentController.getComponentEvent(userId, componentId, componentEventId);
-    if (!event) {
-        res.status(404).send({
-            error: {
-                status: 'Not Found',
-                message: 'No component event with Id: ' + componentEventId + ' was found.'
-            }
-        });        
-    } else {
-        res.send(event);
-    }
-});
-
-/**
- * @swagger
- * 
- * /component/{componentId}/event/{componentEventId}:
- *  put:
- *    summary: Update a Component Event
- *    description: Updates a specific component event
- *    tags:
- *    - Components
- *    parameters:
- *      - in: path
- *        name: componentId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component
- *      - in: path
- *        name: componentEventId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component event
- *    requestBody:
- *      description: The component event to update
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              eventType:
- *                type: string
- *                description: The type of event, for example, `ride` or `manual`.
- *              eventDate:
- *                type: string
- *                format: date-time
- *                description: Timestamp of the event
- *              description:
- *                type: string
- *                description: Description of the event
- *              rideId:
- *                type: string
- *                description: The Id of an associated ride if the eventType is `ride`
- *              distance:
- *                type: number
- *                description: The distance in meters associated with the event
- *              time:
- *                type: number
- *                description: The duration in seconds associated with the event
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: The updated component event
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/ComponentEvent'
- *      401:
- *        description: Unauthorized
- *  
- */
-router.put('/component/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
-    const userId = req.user.userId;
-    const { componentId, componentEventId } = req.params;
-    const eventDto = new ComponentController.ComponentEventDto(req.body);
-
-    const event = await ComponentController.updateComponentEvent(userId, componentId, componentEventId, eventDto);
-    if (!event) {
-        res.status(404).send({
-            error: {
-                status: 'Not Found',
-                message: 'No component event with Id: ' + componentEventId + ' was found.'
-            }
-        });        
-    } else {
-        res.send(event);
-    }
-});
-
-/**
- * @swagger
- * 
- * /component/{componentId}/event/{componentEventId}:
- *  delete:
- *    summary: Delete a Component Event
- *    description: Deletes a specific component event
- *    tags:
- *    - Components
- *    parameters:
- *      - in: path
- *        name: componentId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component
- *      - in: path
- *        name: componentEventId
- *        schema:
- *          type: string
- *        required: true
- *        description: The Id of the component event
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: The deleted component event
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/ComponentEvent'
- *      401:
- *        description: Unauthorized
- *  
- */
-router.delete('/component/:componentId/event/:componentEventId', isAuthenticated, async (req, res) => {
-    const userId = req.user.userId;
-    const { componentId, componentEventId } = req.params;
-
-    const event = await ComponentController.removeComponentEvent(userId, componentId, componentEventId);
-    if (!event) {
-        res.status(404).send({
-            error: {
-                status: 'Not Found',
-                message: 'No component event with Id: ' + componentEventId + ' was found.'
-            }
-        });        
-    } else {
-        res.send(event);
     }
 });
 

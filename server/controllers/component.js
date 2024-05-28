@@ -2,20 +2,6 @@ const ComponentModel = require('../models/component');
 const RideModel = require('../models/ride');
 
 // Our DTO (Data Transfer Objects)
-class ComponentEventDto {
-    constructor(model) {
-        // required fields
-        this.id = model.id;
-        this.eventType = model.eventType,
-        this.eventDate = model.eventDate,
-
-        this.description = model.description,
-        this.rideId = model.rideId,
-        this.distance = model.distance ?? 0,
-        this.time = model.time ?? 0
-    }
-};
-
 class ServiceIntervalDto {
     constructor(model) {
         this.id = model.id;
@@ -41,14 +27,13 @@ class ComponentDto {
         this.isInstalled = model.isInstalled;
         this.installDate = model.installDate;
         this.uninstallDate = model.uninstallDate;
-        this.eventHistory = model.eventHistory?.length > 0 ?
-            model.eventHistory?.map(v => v ? new ComponentEventDto(v) : null) : [];
         this.serviceIntervals = model.serviceIntervals?.length > 0 ?
             model.serviceIntervals?.map(v => v ? new ServiceIntervalDto(v) : null) : [];
 
-        // Compute totals from event history
-        this.totalDistance = model.eventHistory?.reduce( (acc, cur) => acc + (cur?.distance ?? 0), 0);
-        this.totalTime = model.eventHistory?.reduce( (acc, cur) => acc + (cur?.time ?? 0), 0);
+        // Stats
+        this.totalRides = model.totalRides;
+        this.totalDistance = model.totalDistance;
+        this.totalTime = model.totalTime;
     }
 };
 
@@ -182,140 +167,15 @@ const createComponent = async function(userId, componentDto) {
     }
 };
 
-/*******************************************************************************************
- * Component Event History Methods
- ******************************************************************************************/
-
 /**
- * Adds a specific event to the event history of a component.
- * 
- * @param userId            The id of the current user
- * @param componentId       The Id of the component
- * @param componentEventDto The event to add 
- * 
- * @returns {Promise<ComponentDto>} Returns an object containing the component
- **/
-const addComponentEvent = async function(userId, componentId, componentEventDto) {
-    try {
-        const componentModel = await ComponentModel.findOneAndUpdate({
-            userId: userId,
-            _id: componentId
-        }, { 
-            $push: { eventHistory: componentEventDto } 
-        }, {
-            new: true
-        });
-
-        return !componentModel ? null : new ComponentDto(componentModel);
-    } catch (error) {
-        console.log('Error adding component event', error);
-        return null;
-    }
-};
-
-/**
- * Retrieves a specific event from the event history of a component.
- * 
- * @param userId            The id of the current user
- * @param componentId       The Id of the component
- * @param componentEventId  The Id of the event
- * 
- * @returns {Promise<ComponentEventDto>} Returns an object containing the event
- **/
-const getComponentEvent = async function(userId, componentId, componentEventId) {
-    try {
-        // First retreive this component
-        const componentModel = await ComponentModel.findOne({
-            userId: userId,
-            _id: componentId
-        });
-
-        // Now find the specific event
-        const event = componentModel?.eventHistory?.find(e => e.id === componentEventId);
-        if (!event) {
-            return null;
-        }
-
-        return new ComponentEventDto(event);
-    } catch (error) {
-        console.log('Error retrieving component event', error);
-        return null;
-    }
-};
-
-/**
- * Updates a specific event from the event history of a component.
- * 
- * @param userId            The id of the current user
- * @param componentId       The Id of the component
- * @param componentEventId  The Id of the event
- * @param componentEventDto The event data to update
- * 
- * @returns {Promise<ComponentEventDto>} Returns an object containing the event
- **/
-const updateComponentEvent = async function(userId, componentId, componentEventId, componentEventDto) {
-    try {
-        // First retreive this component
-        const componentModel = await ComponentModel.findOne({
-            userId: userId,
-            _id: componentId
-        });
-
-        // Now find the specific event
-        const event = componentModel?.eventHistory?.find(e => e.id === componentEventId);
-        if (!event) {
-            return null;
-        }
-
-        event = componentEventDto;
-        await componentModel.save();
-
-        return new ComponentEventDto(event);
-    } catch (error) {
-        console.log('Error updating component event', error);
-        return null;
-    }
-};
-
-/**
- * Removes a specific event from the event history of a component.
- * 
- * @param userId            The id of the current user
- * @param componentId       The Id of the component
- * @param componentEventId  The Id of the event
- * 
- * @returns {Promise<ComponentEventDto>} Returns an object containing the event removed
- **/
-const removeComponentEvent = async function(userId, componentId, componentEventId) {
-    try {
-        const componentModel = await ComponentModel.findOneAndUpdate({
-            userId: userId,
-            _id: componentId
-        }, { 
-            $pull: { history: {id : componentEventId} } 
-        }, {
-            new: true
-        });
-
-        // Return the event
-        const event = componentModel?.eventHistory?.find(e => e.id === componentEventId);
-        return !event ? null : new ComponentEventDto(event);
-    } catch (error) {
-        console.log('Error removing component event', error);
-        return null;
-    }
-};
-
-/**
- * Synchronizes the event history of a component with the user's ride data.
- * The user's ride history will be scanned and any ride taken that contains
- * this component will be added to the component's event history
+ * Synchronizes a component's stats with the user's ride data.
+ * Updates the totalRides, totalDistance and totalTime properties.
  * 
  * @param userId            The id of the current user
  * @param componentId       The Id of the component
  * 
- * @returns {Promise<ComponentDto>} Returns an object containing the component
- * with added history.
+ * @returns {Promise<ComponentDto>} Returns an object containing the updated component
+ *
  **/
 const synchronizeComponentRides = async function(userId, componentId) {
     try {
@@ -325,48 +185,53 @@ const synchronizeComponentRides = async function(userId, componentId) {
             _id: componentId
         });
 
-        // Make sure component history exists
-        if (!componentModel.eventHistory) {
-            componentModel.eventHistory = [];
+        if (!componentModel) {
+            return null;
         }
-
-        // Access component event history
-        const componentHistory = componentModel.eventHistory;
 
         // Retrieve the user's ride data using date range of component installation life
         const startDate = componentModel.installDate || new Date(Date.now());
         const endDate = componentModel.uninstallDate || new Date(Date.now());
-        const rides = await RideModel.find({
-            userId: userId,
-            startDate: { $gte: startDate, $lte: endDate },
-            // TODO: We need to match the gear used for ride
-        });
 
-        // Make sure all of these rides are in the component history
-        let totalRides = 0;
-        for (let index = 0; index < rides.length; index++) {
-            const ride = rides[index];
-            if (!componentHistory?.find(e => e.rideId === ride.rideId)) {
-                // This ride is not present
-                console.log('Adding ride ' + ride.rideId + ' to history of component ' + componentId);
-                const event = new ComponentEventDto({
-                    eventType: 'RIDE',
-                    eventDate: ride.startDate,
-                    description: ride.name,
-                    rideId: ride.rideId,
-                    distance: ride.distance,
-                    time: ride.movingTime
-                });
+        // TODO: We need to incorporate Bike / Gear Ids
 
-                // Add the ride to component history
-                componentHistory.push(event);
-                totalRides++;
+        // Use aggregate function to get cummulative stats for this component
+        const componentStats = await RideModel.aggregate([
+            { 
+                $match: { 
+                    userId: userId,
+                    startDate: { $gte: startDate, $lte: endDate },
+                } 
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalRides: { $sum: 1 },
+                    totalDistance: { $sum: "$distance" },
+                    totalTime: { $sum: "$movingTime" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    totalRides: 1,
+                    totalDistance: 1,
+                    totalTime: 1
+                }
             }
+        ]);
+
+        // update component stats
+        if (componentStats.length > 0) {
+            const stats = componentStats[0];
+            componentModel.totalRides = stats.totalRides;
+            componentModel.totalDistance = stats.totalDistance;
+            componentModel.totalTime = stats.totalTime;
         }
 
         // Save the document
         await componentModel.save();
-        console.log('Updated component ' + componentId + ' with ' + totalRides + ' new rides.');
+        console.log('Updated component ' + componentId + ' with ' + componentModel.totalRides + ' rides.');
 
         // Return the component
         return new ComponentDto(componentModel);
@@ -504,7 +369,6 @@ const removeComponentService = async function(userId, componentId, componentServ
 
 module.exports = {
     ComponentDto,
-    ComponentEventDto,
     ServiceIntervalDto,
 
     getComponentsForUser,
@@ -513,10 +377,6 @@ module.exports = {
     updateComponent,
     createComponent,
 
-    addComponentEvent,
-    getComponentEvent,
-    updateComponentEvent,
-    removeComponentEvent,
     synchronizeComponentRides,
 
     addComponentService,
