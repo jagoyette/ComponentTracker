@@ -28,7 +28,7 @@ class ComponentDto {
         this.installDate = model.installDate;
         this.uninstallDate = model.uninstallDate;
         this.serviceIntervals = model.serviceIntervals?.length > 0 ?
-            model.serviceIntervals?.map(v => v ? new ServiceIntervalDto(v) : null) : [];
+            model.serviceIntervals?.map(v => v ? new ServiceIntervalDto(v) : null) : undefined;
 
         // Stats
         this.totalRides = model.totalRides;
@@ -266,7 +266,8 @@ const addComponentService = async function(userId, componentId, serviceIntervalD
             new: true
         });
 
-        return !componentModel ? null : new ComponentDto(componentModel);
+        const service = componentModel.serviceIntervals[componentModel.serviceIntervals.length - 1];
+        return new ServiceIntervalDto(service);
     } catch (error) {
         console.log('Error adding component service interval', error);
         return null;
@@ -291,7 +292,7 @@ const getComponentService = async function(userId, componentId, componentService
         });
 
         // Now find the specific service
-        const service = componentModel?.serviceIntervals?.find(e => e.id === componentServiceId);
+        const service = componentModel?.serviceIntervals?.find(e => e._id === componentServiceId);
         if (!service) {
             return null;
         }
@@ -322,7 +323,7 @@ const updateComponentService = async function(userId, componentId, componentServ
         });
 
         // Now find the specific service interval
-        const service = componentModel?.serviceIntervals?.find(e => e.id === componentServiceId);
+        const service = componentModel?.serviceIntervals?.find(e => e._id === componentServiceId);
         if (!service) {
             return null;
         }
@@ -352,9 +353,7 @@ const removeComponentService = async function(userId, componentId, componentServ
             userId: userId,
             _id: componentId
         }, { 
-            $pull: { serviceIntervals: {id : componentServiceId} } 
-        }, {
-            new: true
+            $pull: { serviceIntervals: {_id : componentServiceId} } 
         });
 
         // Return the service interval
