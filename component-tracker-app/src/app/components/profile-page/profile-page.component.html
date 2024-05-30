@@ -31,7 +31,7 @@
     <p></p>
     <!-- Show a link to integrate Strava if not integrated yet -->
     <div [hidden]="stravaUser">
-        <a href="{{stravaIntegrationUrl}}"><button>Connect with Strava</button></a>
+        <button (click)="integrateStrava()">Connect with Strava</button>
     </div>
     <div [hidden]="!stravaUser">
         <button (click)="disconnectStrava()">Disconnect Strava</button>
@@ -41,7 +41,7 @@
     <p></p>
     <!-- Show a link to integrate Ride with GPS if not integrated yet -->
     <div [hidden]="rwgpsUser">
-        <a href="{{rwgpsIntegrationUrl}}"><button>Connect with Ride with GPS</button></a>
+        <button (click)="integrateRwgps()">Connect with Ride with GPS</button>
     </div>
     <div [hidden]="!rwgpsUser">
         <button (click)="disconnectRwgps()">Disconnect Ride with GPS</button>

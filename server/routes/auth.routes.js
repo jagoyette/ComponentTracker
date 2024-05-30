@@ -2,29 +2,61 @@ const express = require("express");
 const passport = require("passport");
 const axios = require("axios");
 const Url = require("url");
+const crypto = require("crypto");
+const ms = require("ms");
 
+const jwtConfig = require('../configs/jwt');
 const Utils = require('../utils/network');
-const StravaAthlete = require("../models/strava.athlete");
-const StravaToken = require("../models/strava.token");
-const RwgpsAthlete = require('../models/rwgps.athlete');
 const UserController = require('../controllers/user');
-const RwgpsToken = require("../models/rwgps.token");
 
 const router = express.Router();
 
-// Logout user
-router.post('/logout', function (req, res, next) {
-    req.logOut(function (err) {
-        if (err) { return next(err); }
-        res.send({
-            success: true,
-            message: "User logged out"
-        });
-    });
-});
-
-// Returns current user if logged in
+/**
+ * @swagger
+ *
+ * /auth/user:
+ *   get:
+ *     tags:
+ *     - Auth
+ *     summary: Get Current User
+ *     description: Returns the currently authenticated user
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Current User Information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                   description: The user's unique identifier.
+ *                   example: "109876543212345678901"
+ *                 id:
+ *                   type: string
+ *                   description: The user's Id in the third party user authentication provider.
+ *                   example: "1234567890987654321"
+ *                 provider:
+ *                   type: string
+ *                   description: The name of the third party user authentication provider.
+ *                   example: "google"
+ *                 name:
+ *                   type: string
+ *                   description: The user's full name.
+ *                   example: "John Doe"
+ *                 email:
+ *                   type: string
+ *                   description: The user's email.
+ *                   example: "john.doe@acme.com" 
+ *
+ *       401:
+ *         description: Unauthorized
+ *
+ */
 router.get('/user',
+    passport.authenticate('jwt', { session: false }),
     async (req, res) => {
         // extract provider and id from our current user
         const id = req.user?.id;
@@ -33,7 +65,6 @@ router.get('/user',
         res.send(user);
     }
 );
-
 
 // method to encode redirect urls into a state object
 // Used for OAuth redirect workflows so that application redirects can
@@ -83,7 +114,7 @@ router.get('/google/login', (req, res, next) => {
     // Initiate OAuth2 authentication flow
     passport.authenticate('google', {
         scope: [ 'email', 'profile' ],
-        state: encodeStateRedirects(req, '/', '../google/failure')
+        state: encodeStateRedirects(req, '../google/success', '../google/failure')
     })(req, res, next);
 });
 
@@ -92,215 +123,62 @@ router.get('/google/login', (req, res, next) => {
 // user appropriately
 router.get('/google/callback', (req, res, next) => {
     try {
-        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../google/failure');
+        const { successRedirect, failureRedirect } = decodeStateRedirects(req, '../google/success', '../google/failure');
 
         // Let passport authenticate and redirect
         passport.authenticate('google', {
-            successRedirect,
-            failureRedirect
-        })(req, res, next);
+            session: false
+        }, (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
 
+            if (!user) {
+                res.redirect(failureRedirect);
+            } else {
+                // Successful login, generate access token
+                const expiresInMs = ms('30m');
+                const token = jwtConfig.signingFunction(user._id, expiresInMs / 1000.0);
+                const refresh_token = jwtConfig.signingFunction(token, '5d', 'refresh');
+
+                // Add the access token to our response as a short lived cookie
+                const access_token = {
+                    token: token,
+                    expires: new Date(Date.now() + expiresInMs),
+                    refresh_token: refresh_token
+                };
+                res.cookie('access_token', JSON.stringify(access_token), {maxAge: 60 * 1000});
+
+                // Resolve the successRedirect Url and redirect response
+                res.redirect(new URL(successRedirect, Utils.originalURL(req, {proxy: true})));
+            }
+        })(req, res, next);
     } catch (err) {
         console.error(err);
+        return next(err);
+    }
+});
+
+router.get('/google/success', (req, res) => {
+    console.error('Google login success');
+    try {
+        const access_token = JSON.parse(req.cookies['access_token']);
+        res.cookie('access_token', '', {maxAge: 0});        // delete cookie
+        res.send(access_token);
+    } catch (error) {
+        res.send({
+            status: 200,
+            message: `Error encountered: ${error}`
+        });
     }
 });
 
 router.get('/google/failure', (req, res) => {
     console.error('Google login failed');
-    res.send('No dice');
-});
-
-///////////////////////////////////////////////////////////////////////////////
-// Strava Integration
-///////////////////////////////////////////////////////////////////////////////
-
-// Integrate Strava with user account
-// This route initiates an OAuth workflow to approve integration
-// of their Strava account with this app. The user will be redirected
-// to a Strava site where they must approve or reject the integration.
-// The Strava site will call our redirect_url below (see /strava/callback)
-router.get('/strava/integrate', (req, res, next) => {
-    const client_id = process.env.STRAVA_CLIENT_ID;
-    const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    const callback = Url.resolve(fullUrl, req.baseUrl + '/strava/callback');
-    const scope = 'activity:read_all'; //'read';
-    const approval_prompt = 'auto';
-    const state = encodeStateRedirects(req, '/', '../strava/failure');
-
-    // build the Strava url and redirect user
-    const url = new URL('http://www.strava.com/oauth/authorize');
-    url.searchParams.append('client_id', client_id);
-    url.searchParams.append('redirect_uri', callback);
-    url.searchParams.append('response_type', 'code');
-    url.searchParams.append('approval_prompt', approval_prompt);
-    url.searchParams.append('scope', scope);
-    url.searchParams.append('state', state);
-
-    res.redirect(url);
-});
-
-// Callback (redirect_uri) called by Strava Oauth
-// If the user approved the integration, we will have and authorization
-// code in the query params of this request url
-router.get('/strava/callback', async function (req, res, next) {
-    // extract the authorization code
-    const { code, state, scope }= req.query;
-    const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../strava/failure');
-    const url = "https://www.strava.com/api/v3/oauth/token";
-    const client_id = process.env.STRAVA_CLIENT_ID;
-    const client_secret = process.env.STRAVA_CLIENT_SECRET;
-
-    if (code) {
-        try {
-            // Exchange the authorization code for an access token
-            const result = await axios.post(url, {
-                client_id: client_id,
-                client_secret: client_secret,
-                grant_type: "authorization_code",
-                code: code
-            });
-
-            // extract token and athlete data
-            const { athlete, access_token, refresh_token, expires_at } = result.data;
-
-            // Get the userId of the current user
-            const userId = req.user?.userId;
-            if (!userId) {
-                console.error('Cannot integrate Strava without signing in');
-                res.redirect(failureRedirect);
-                return;
-            }
-
-            // Create the athlete if needed
-            const stravaAthlete = StravaAthlete.fromAthlete(userId, athlete);
-            const athleteModel = await StravaAthlete.findOrCreateAthlete(stravaAthlete);
-            console.log(`Strava Athlete ${athleteModel.id} integrated for user ${userId}`);
-
-            // Store the access token
-            const stravaToken = {
-                userId: userId,
-                accessToken: access_token,
-                refreshToken: refresh_token,
-                expiresAt: new Date(expires_at*1000)
-            }
-            const tokenModel = await StravaToken.createOrUpdateToken(stravaToken);
-
-            // finally redirect to success url
-            res.redirect(successRedirect);
-            return;
-
-        } catch (error) {
-            console.log(`Error getting token`, error);
-        }
-    }
-
-    // Failed to get authorization
-    res.redirect(failureRedirect);
-    return;
-});
-
-router.get('/strava/failure', (req, res) => {
-    console.error('Strava integration falied');
-    res.send('No dice');
-});
-
-///////////////////////////////////////////////////////////////////////////////
-// Ride With GPS Integration
-///////////////////////////////////////////////////////////////////////////////
-
-// Integrate Ride With GPS with user account
-// This route initiates an OAuth workflow to approve integration
-// of the users RWGPS account with this app. The user will be redirected
-// to a RWGPS site where they must approve or reject the integration.
-// The RWGPS site will call our redirect_url below (see /rwgps/callback)
-router.get('/rwgps/integrate', (req, res, next) => {
-    const client_id = process.env.RWGPS_CLIENT_ID;
-    const originalUrl = Utils.originalURL(req, { proxy: true });
-    const callback = Url.resolve(originalUrl, req.baseUrl + '/rwgps/callback');
-    const state = encodeStateRedirects(req, '/', '../rwgps/failure');
-
-    // build the RWGPS url and redirect user
-    const url = new URL('http://ridewithgps.com/oauth/authorize');
-    url.searchParams.append('client_id', client_id);
-    url.searchParams.append('redirect_uri', callback);
-    url.searchParams.append('response_type', 'code');
-    url.searchParams.append('state', state);
-
-    res.redirect(url);
-});
-
-// Callback (redirect_uri) called by RWGPS Oauth
-// If the user approved the integration, we will have and authorization
-// code in the query params of this request url
-router.get('/rwgps/callback', async function (req, res, next) {
-    // extract the authorization code
-    const { code, state, scope }= req.query;
-    const { successRedirect, failureRedirect } = decodeStateRedirects(req, '/', '../rwgps/failure');
-    const url = "https://ridewithgps.com/oauth/token.json";
-    const client_id = process.env.RWGPS_CLIENT_ID;
-    const client_secret = process.env.RWGPS_CLIENT_SECRET;
-
-    if (code) {
-        // Get the userId of the current user
-        const userId = req.user?.userId;
-        if (!userId) {
-            console.error('Cannot integrate RWGPS without signing in');
-            res.redirect(failureRedirect);
-            return;
-        }
-        
-        try {
-            // We need to pass the original redirect uri
-            const originalUrl = Utils.originalURL(req, { proxy: true });
-            const redirect_uri = Url.resolve(originalUrl, req.baseUrl + req.path);
-
-            // Exchange the authorization code for an access token
-            const body = {
-                client_id: client_id,
-                client_secret: client_secret,
-                grant_type: "authorization_code",
-                code: code,
-                redirect_uri: redirect_uri
-            };
-            let result = await axios.post(url, body);
-
-            // create token container from response
-            const rwgpsToken = RwgpsToken.createFromRwgps(userId, result.data);
-
-            // retrieve current user info
-            result = await axios.get('https://ridewithgps.com/users/current.json', {
-                headers: {
-                    Authorization: "Bearer " + rwgpsToken.accessToken
-                }
-            });
-
-            // Create the athlete if needed
-            const user = result?.data?.user;
-            const rwgpsAthlete = RwgpsAthlete.fromAthlete(userId, user);
-            const rwgpsAthleteModel = await RwgpsAthlete.findOrCreateAthlete(userId, rwgpsAthlete);
-            console.log(`Ride with GPS Athlete ${rwgpsAthleteModel.id} integrated for user ${userId}`);
-
-            // Store the access token
-            const tokenModel = await RwgpsToken.createOrUpdateToken(rwgpsToken);
-
-            // finally redirect to success url
-            res.redirect(successRedirect);
-            return;
-
-        } catch (error) {
-            console.log(`Error getting token`, error);
-            console.log(error.response.data);
-        }
-    }
-
-    // Failed to get authorization
-    res.redirect(failureRedirect);
-    return;
-});
-
-router.get('/rwgps/failure', (req, res) => {
-    console.error('RWGPS integration falied');
-    res.send('No dice');
+    res.status(401).send({
+        status: 401,
+        message: 'Login failure'
+    });
 });
 
 // export the router

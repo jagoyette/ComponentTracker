@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 
 import { ComponentTrackerApiService } from '../../services/component-tracker-api.service';
 import { User } from '../../models/user';
-import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -16,20 +16,21 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ProfilePageComponent implements OnInit{
   
-  constructor (private apiService: ComponentTrackerApiService, private authService: AuthService) {}
+  constructor (private apiService: ComponentTrackerApiService, private authService: AuthService, private router: Router,
+    private activeRoute: ActivatedRoute, private cookieService: CookieService) {}
 
   public user: User | null = null;
   public rideStats: any | null = null;
   public stravaUser: any | null = null;
-  public stravaIntegrationUrl: String | null = null;
   public rwgpsUser: any | null = null;
-  public rwgpsIntegrationUrl: String | null = null;
 
   ngOnInit(): void {
     // Retrieve the currently logged in user
     this.authService.getCurrentUser().subscribe(data => {
       this.user = data;
       console.log('Current user', this.user);
+    }, err => {
+      console.log('Not logged in');
     });
 
     // Check for current strava user
@@ -49,21 +50,37 @@ export class ProfilePageComponent implements OnInit{
 
     // Get user's stats
     this.updateRideStats();
-
-    // Build the strava integration url
-    const origin = window.location.origin;
-
-    // Add success and failure redirects to the url
-    const successUrl = `${origin}/profile`;
-    const failureUrl = `${origin}/strava/failure`;
-    this.stravaIntegrationUrl = `${environment.API_SERVER_URL}auth/strava/integrate?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
-    this.rwgpsIntegrationUrl = `${environment.API_SERVER_URL}auth/rwgps/integrate?successRedirect=${origin}/profile&failureRedirect=${origin}/rwgps/failure`;
   }
 
   logout(): void {
-    this.authService.logout().subscribe(result => {
-      if (result?.success) {
-        this.user = null;
+    this.authService.logout();
+    this.router.navigate(['home']);
+  }
+
+  integrateStrava(): void {
+    const origin = window.location.origin;
+    const successUrl = `${origin}/integration/result?provider=strava&result=success&return=profile`;
+    const failureUrl = `${origin}/integration/result?provider=strava&result=failure&return=profile`;
+    const appState = this.authService.createApplicationState();
+    const appStateCookieName = this.authService.APP_STATE_COOKIE_NAME;
+    this.apiService.integrateStrava(successUrl, failureUrl, appState, appStateCookieName).subscribe(data => {
+      console.log('Starting Strava OAuth workflow');
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    });
+  }
+
+  integrateRwgps(): void {
+    const origin = window.location.origin;
+    const successUrl = `${origin}/integration/result?provider=rwgps&result=success&return=profile`;
+    const failureUrl = `${origin}/integration/result?provider=rwgps&result=failure&return=profile`;
+    const appState = this.authService.createApplicationState();
+    const appStateCookieName = this.authService.APP_STATE_COOKIE_NAME;
+    this.apiService.integrateRwgps(successUrl, failureUrl, appState, appStateCookieName).subscribe(data => {
+      console.log('Starting RWGPS OAuth workflow');
+      if (data.url) {
+        window.location.href = data.url;
       }
     });
   }
@@ -79,7 +96,6 @@ export class ProfilePageComponent implements OnInit{
     this.apiService.deleteStravaAthlete().subscribe(result => {
       console.log(result);
       this.stravaUser = null;
-      this.rideStats = null;
     })
   };
 
