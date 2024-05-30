@@ -12,9 +12,6 @@ const swaggerSpecs = swaggerJsdoc({
             `,
             version: "1.0.0",
         },
-        servers: [{
-            "url": "http://localhost:3000/"
-        }],
         components: {
             securitySchemes: {
                 jwt: {
