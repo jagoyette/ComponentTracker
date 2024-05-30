@@ -61,7 +61,9 @@ export class ProfilePageComponent implements OnInit{
     const origin = window.location.origin;
     const successUrl = `${origin}/integration/result?provider=strava&result=success&return=profile`;
     const failureUrl = `${origin}/integration/result?provider=strava&result=failure&return=profile`;
-    this.authService.integrateStrava(successUrl, failureUrl).subscribe(data => {
+    const appState = this.authService.createApplicationState();
+    const appStateCookieName = this.authService.APP_STATE_COOKIE_NAME;
+    this.apiService.integrateStrava(successUrl, failureUrl, appState, appStateCookieName).subscribe(data => {
       console.log('Starting Strava OAuth workflow');
       if (data.url) {
         window.location.href = data.url;
@@ -73,7 +75,9 @@ export class ProfilePageComponent implements OnInit{
     const origin = window.location.origin;
     const successUrl = `${origin}/integration/result?provider=rwgps&result=success&return=profile`;
     const failureUrl = `${origin}/integration/result?provider=rwgps&result=failure&return=profile`;
-    this.authService.integrateRwgps(successUrl, failureUrl).subscribe(data => {
+    const appState = this.authService.createApplicationState();
+    const appStateCookieName = this.authService.APP_STATE_COOKIE_NAME;
+    this.apiService.integrateRwgps(successUrl, failureUrl, appState, appStateCookieName).subscribe(data => {
       console.log('Starting RWGPS OAuth workflow');
       if (data.url) {
         window.location.href = data.url;
