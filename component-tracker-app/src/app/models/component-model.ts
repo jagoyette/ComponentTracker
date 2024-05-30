@@ -1,3 +1,5 @@
+import { ServiceInterval } from "./service-interval";
+
 export class ComponentModel {
     id: string | undefined;
     userId: string | undefined;
@@ -10,10 +12,9 @@ export class ComponentModel {
     isInstalled: boolean | undefined;
     installDate: Date | undefined;
     uninstallDate: Date | undefined;
-    eventHistory: any[] | undefined;
-    serviceIntervals: any[] | undefined;
+    serviceIntervals: ServiceInterval[] | undefined;
 
+    totalRides: Number = 0;
     totalDistance: Number = 0;
     totalTime: Number = 0;
-
 }

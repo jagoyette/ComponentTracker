@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 import { ComponentTrackerApiService } from '../../services/component-tracker-api.service';
 import { ComponentModel } from '../../models/component-model';
 import { ComponentDetailComponent } from '../component-detail/component-detail.component';
-import { NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+
+import { ServiceInterval } from '../../models/service-interval';
 
 @Component({
   selector: 'app-components-page',
@@ -19,7 +22,8 @@ export class ComponentsPageComponent implements OnInit {
   public myComponents : ComponentModel[] = [];
   public selectedComponent: ComponentModel | undefined;
   public newComponent: ComponentModel | undefined;
-  public serviceInterval = {
+  public serviceInterval: ServiceInterval = {
+    id: "",
     name: "MaxLife",
     description: "Maximum lifetime of component",
     distance: 0
