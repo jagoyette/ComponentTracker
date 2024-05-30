@@ -8,8 +8,8 @@ class StravaAthleteDto {
     constructor(stravaAthlete) {
         this.userId = stravaAthlete?.userId;
         this.id = stravaAthlete?.id;
-        this.firstName = stravaAthlete?.firstname;
-        this.lastName = stravaAthlete?.lastname;
+        this.firstName = stravaAthlete?.firstName;
+        this.lastName = stravaAthlete?.lastName;
         this.profileMedium = stravaAthlete?.profileMedium;
         this.profile = stravaAthlete?.profile;
         this.city = stravaAthlete?.city;

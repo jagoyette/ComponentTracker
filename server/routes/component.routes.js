@@ -162,7 +162,6 @@ router.get('/component/', isAuthenticated, async (req, res) => {
  *    - Components
  *    requestBody:
  *      description: The component to create
- *      required: true
  *      content:
  *        application/json:
  *          schema:
@@ -279,7 +278,6 @@ router.get('/component/:componentId', isAuthenticated, async (req, res) => {
  *        description: The Id of the component to update
  *    requestBody:
  *      description: The component to create
- *      required: true
  *      content:
  *        application/json:
  *          schema:
@@ -454,7 +452,6 @@ router.post('/component/:componentId/sync', isAuthenticated, async (req, res) =>
  *        description: The Id of the component
  *    requestBody:
  *      description: The component event to create
- *      required: true
  *      content:
  *        application/json:
  *          schema:
@@ -586,7 +583,6 @@ router.get('/component/:componentId/event/:componentEventId', isAuthenticated, a
  *        description: The Id of the component event
  *    requestBody:
  *      description: The component event to update
- *      required: true
  *      content:
  *        application/json:
  *          schema:
@@ -712,7 +708,6 @@ router.delete('/component/:componentId/event/:componentEventId', isAuthenticated
  *        description: The Id of the component
  *    requestBody:
  *      description: The service interval to create
- *      required: true
  *      content:
  *        application/json:
  *          schema:
@@ -840,7 +835,6 @@ router.get('/component/:componentId/service/:componentServiceId', isAuthenticate
  *        description: The Id of the service interval
  *    requestBody:
  *      description: The service interval to update
- *      required: true
  *      content:
  *        application/json:
  *          schema:

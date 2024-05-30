@@ -27,6 +27,9 @@ app.use('/', [rideRoutes, stravaRoutes, rwgpsRoutes, compRoutes]);
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpecs = require("./configs/swagger");
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use("/swagger.json", swaggerUi.serve, (req, res) => {
+    res.send(swaggerSpecs);
+})
 
 // Serve the Angular app from our 'public' folder
 const express = require('express');
