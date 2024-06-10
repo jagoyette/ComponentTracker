@@ -1,5 +1,6 @@
 const { timeStamp } = require('console');
 const RideModel = require('../models/ride');
+const ComponentModel = require('../models/component');
 
 // Our DTO (Data Transfer Objects)
 class RideDto {
@@ -22,6 +23,43 @@ class RideDto {
         this.trainer = model.trainer;
     }
 };
+
+// Retrieve rides for user
+const getAthleteRides = async function (userId) {
+    try {
+        const rides = await RideModel.find({userId: userId});
+        if (!rides) {
+            // just return an empty array
+            return [];
+        }
+
+        return rides.map(r => new RideDto(r));
+    } catch (error) {
+        console.log('Error retrieving athlete rides', error);  
+    }
+
+    return null;
+}
+
+
+// Retrieve specific ride
+const getAthleteRide = async function (userId, id) {
+    try {
+        const ride = await RideModel.findById(id);
+
+        // Make sure user owns this ride
+        if (ride?.userId != userId) {
+            console.log('User ' + userId + ' does not own ride ' + id);
+            return null;
+        }
+
+        return new RideDto(ride);
+    } catch (error) {
+        console.log('Error retrieving athlete ride', error);  
+    }
+
+    return null;
+}
 
 // Retrieve cummulative statistics for an athlete's rides
 const getAthleteStats = async function(userId) {
@@ -50,7 +88,35 @@ const getAthleteStats = async function(userId) {
     }
 };
 
+// Retrieve rides for given component
+const getComponentRides = async function (userId, componentId) {
+    try {
+        const component = await ComponentModel.findById(componentId);
+        if (component) {
+            const startDate = component.installDate || new Date(Date.now());
+            const endDate = component.uninstallDate || new Date(Date.now());
+            const rides = await RideModel.find({
+                userId: userId,
+                startDate: { $gte: startDate, $lte: endDate }
+            });
+
+            if (!rides) {                
+                return [];
+            }
+
+            return rides.map(r => new RideDto(r));
+        }
+    } catch (error) {
+        console.log('Error retrieving rides for component', error);  
+    }
+
+    return null;
+}
+
 module.exports = {
     RideDto,
-    getAthleteStats
+    getAthleteStats,
+    getAthleteRides,
+    getAthleteRide,
+    getComponentRides
 }
