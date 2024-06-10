@@ -13,7 +13,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
   
-  public readonly baseUrl = environment.API_SERVER_URL || '/';
+  public readonly baseUrl = environment.AUTH_SERVER_URL || '/auth/';
   public user: User | null | undefined;
   public accessToken: AccessToken | null | undefined;
 
@@ -63,7 +63,7 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<User> {
-    const url = this.baseUrl + 'auth/user'
+    const url = this.baseUrl + 'user'
     return this.http.get<User>(url).pipe(
       tap(user => this.user = user)
     );
@@ -93,7 +93,7 @@ export class AuthService {
     // Add success and failure redirects to the login url
     const successUrl = `${origin}${successPath}`;
     const failureUrl = `${origin}${failurePath}`;
-    return`${this.baseUrl}auth/google/login?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
+    return`${this.baseUrl}google/login?successRedirect=${successUrl}&failureRedirect=${failureUrl}`;
   }
 
 }
