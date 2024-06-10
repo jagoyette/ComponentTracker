@@ -17,12 +17,13 @@ const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
 // API Routes
+const userRoutes = require('./routes/user.routes');
 const rideRoutes = require('./routes/ride.routes');
 const stravaRoutes = require('./routes/strava.routes');
 const rwgpsRoutes = require('./routes/rwgps.routes');
 const compRoutes = require('./routes/component.routes');
 const bikeRoutes = require('./routes/bike.routes');
-app.use('/', [rideRoutes, stravaRoutes, rwgpsRoutes, compRoutes, bikeRoutes]);
+app.use('/api', [userRoutes, rideRoutes, stravaRoutes, rwgpsRoutes, compRoutes, bikeRoutes]);
 
 // Setup Swagger API documentation end point
 const swaggerUi = require("swagger-ui-express");
