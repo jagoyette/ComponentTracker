@@ -108,6 +108,43 @@ router.get('/ride', isAuthenticated, async (req, res) => {
 /**
  * @swagger
  * 
+ * /ride/statistics:
+ *   get:
+ *     summary: Get Ride Statistics
+ *     description: Retrieves statistics for user's rides
+ *     tags:
+ *     - Rides
+ *     produces:
+ *        - application/json
+ *     responses:
+ *        200:
+ *          description: Ride statistics
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  totalRides:
+ *                    type: number
+ *                    description: The total number of rides taken
+ *                  totalDistance:
+ *                    type: number
+ *                    description: The total distance in meters traveled
+ *                  totalTime:
+ *                    type: number
+ *                    description: The total duration in seconds of riding time
+ *        401:
+ *          description: Unauthorized
+ * 
+ */
+router.get('/ride/statistics', isAuthenticated, async (req, res) => {
+    const stats = await RideController.getAthleteStats(req.user.userId);
+    res.send(stats);
+});
+
+/**
+ * @swagger
+ * 
  * /ride/{id}:
  *   get:
  *     summary: Get a Ride
@@ -197,42 +234,5 @@ router.get('/ride/component/:componentId', isAuthenticated, async (req, res) => 
     }
 });
 
-
-/**
- * @swagger
- * 
- * /ride/statistics:
- *   get:
- *     summary: Get Ride Statistics
- *     description: Retrieves statistics for user's rides
- *     tags:
- *     - Rides
- *     produces:
- *        - application/json
- *     responses:
- *        200:
- *          description: Ride statistics
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  totalRides:
- *                    type: number
- *                    description: The total number of rides taken
- *                  totalDistance:
- *                    type: number
- *                    description: The total distance in meters traveled
- *                  totalTime:
- *                    type: number
- *                    description: The total duration in seconds of riding time
- *        401:
- *          description: Unauthorized
- * 
- */
-router.get('/ride/statistics', isAuthenticated, async (req, res) => {
-    const stats = await RideController.getAthleteStats(req.user.userId);
-    res.send(stats);
-});
 
 module.exports = router;
