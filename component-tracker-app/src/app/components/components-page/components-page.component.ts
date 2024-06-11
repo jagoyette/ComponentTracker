@@ -13,7 +13,7 @@ import { ServiceInterval } from '../../models/service-interval';
   standalone: true,
   imports: [ComponentDetailComponent, NgFor, NgIf, FormsModule],
   templateUrl: './components-page.component.html',
-  styleUrl: './components-page.component.css'
+  styleUrl: './components-page.component.scss'
 })
 export class ComponentsPageComponent implements OnInit {
 

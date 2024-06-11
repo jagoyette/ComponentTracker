@@ -9,7 +9,7 @@ import { CookieService } from 'ngx-cookie-service';
   standalone: true,
   imports: [RouterModule],
   templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.css'
+  styleUrl: './login-page.component.scss'
 })
 export class LoginPageComponent implements OnInit {
 
