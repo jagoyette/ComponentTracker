@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { routes } from './app.routes';
 import { cookieAuthInterceptor } from './interceptors/cookie-auth.interceptor';
 import { jwtAuthInterceptor } from './interceptors/jwt-auth.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +15,6 @@ export const appConfig: ApplicationConfig = {
       cookieAuthInterceptor,
       jwtAuthInterceptor
     ])),
-    CookieService
+    CookieService, provideAnimationsAsync()
   ]
 };
