@@ -1,3 +1,4 @@
 export const environment = {
-    API_SERVER_URL: "/"
+    AUTH_SERVER_URL: "/auth/",
+    API_SERVER_URL: "/api/"
 };

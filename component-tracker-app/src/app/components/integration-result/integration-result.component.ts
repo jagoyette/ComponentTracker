@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [RouterModule],
   templateUrl: './integration-result.component.html',
-  styleUrl: './integration-result.component.css'
+  styleUrl: './integration-result.component.scss'
 })
 export class IntegrationResultComponent implements OnInit {
 

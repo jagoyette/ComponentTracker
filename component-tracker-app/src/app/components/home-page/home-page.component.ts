@@ -3,13 +3,14 @@ import { RouterLink } from '@angular/router';
 
 import { User } from '../../models/user';
 import { AuthService } from '../../services/auth.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, MatButtonModule],
   templateUrl: './home-page.component.html',
-  styleUrl: './home-page.component.css'
+  styleUrl: './home-page.component.scss'
 })
 export class HomePageComponent implements OnInit {
 

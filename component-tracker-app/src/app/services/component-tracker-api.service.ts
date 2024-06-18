@@ -14,7 +14,7 @@ export class ComponentTrackerApiService {
     console.log('Api Service Url: ' + this.baseUrl);
    }
 
-  private readonly baseUrl = environment.API_SERVER_URL || '/';
+  private readonly baseUrl = environment.API_SERVER_URL || '/api/';
 
 
 

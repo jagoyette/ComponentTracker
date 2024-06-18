@@ -12,6 +12,7 @@ const swaggerSpecs = swaggerJsdoc({
             `,
             version: "1.0.0",
         },
+        servers: [{ url: '/api' }],
         components: {
             securitySchemes: {
                 jwt: {
@@ -27,5 +28,6 @@ const swaggerSpecs = swaggerJsdoc({
     },
     apis: [path.join(__dirname, "../routes/*.js")],
 });
+
 
 module.exports = swaggerSpecs;

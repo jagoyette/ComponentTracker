@@ -7,17 +7,23 @@ import { ComponentModel } from '../../models/component-model';
 import { ComponentDetailComponent } from '../component-detail/component-detail.component';
 
 import { ServiceInterval } from '../../models/service-interval';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-components-page',
   standalone: true,
-  imports: [ComponentDetailComponent, NgFor, NgIf, FormsModule],
+  imports: [ComponentDetailComponent, NgFor, NgIf, FormsModule, MatButtonModule, MatTableModule, MatInputModule, MatFormFieldModule],
   templateUrl: './components-page.component.html',
-  styleUrl: './components-page.component.css'
+  styleUrl: './components-page.component.scss'
 })
 export class ComponentsPageComponent implements OnInit {
 
   constructor (private apiService: ComponentTrackerApiService) {}
+
+  displayedColumns: string[] = ['category', 'name', 'select', 'delete'];
 
   public myComponents : ComponentModel[] = [];
   public selectedComponent: ComponentModel | undefined;

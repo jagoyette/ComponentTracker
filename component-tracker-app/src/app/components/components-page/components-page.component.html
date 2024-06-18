@@ -1,60 +1,68 @@
 <h3>My Components</h3>
 
 
-<table style="text-align: left;height: 120px; overflow: scroll;">
-    <tr>
-        <th>Category</th>
-        <th>Name</th>
-        <th>Select</th>
-        <th>Delete</th>
-    </tr>
-    <tr *ngFor="let component of myComponents">
-        <td>{{component.category}}</td>
-        <td>{{component.name}}</td>
-        <td><button (click)="onSelect(component)">Select</button></td>
-        <td><button (click)="onDelete(component)">Delete</button></td>
-    </tr>
+<table mat-table [dataSource]="myComponents">
+  <ng-container matColumnDef="category">
+    <th mat-header-cell *matHeaderCellDef>Category</th>
+    <td mat-cell *matCellDef="let element">{{element.category}}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+  </ng-container> 
+
+  <ng-container matColumnDef="select">
+    <th mat-header-cell *matHeaderCellDef>Select</th>
+    <td mat-cell *matCellDef="let element"><button mat-raised-button class="mat-primary" (click)="onSelect(element)">Select</button></td>
+  </ng-container>
+
+  <ng-container matColumnDef="delete">
+    <th mat-header-cell *matHeaderCellDef>Delete</th>
+    <td mat-cell *matCellDef="let element"><button mat-raised-button class="mat-primary" (click)="onDelete(element)">Delete</button></td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>  
 </table>
 
-<button (click)="onAddComponent()">Add New Component</button>
-<div *ngIf="newComponent && !selectedComponent">
+<button mat-raised-button class="mat-primary" (click)="onAddComponent()">Add New Component</button>
+<form *ngIf="newComponent && !selectedComponent">
     <br>
     <div><b>Create a new component</b></div>
-    <div>
-        <label for="category">Category: </label>
-        <input id="category" [(ngModel)]="newComponent.category" placeholder="category">
-    </div>
-    <div>
-        <label for="name">Name: </label>
-        <input id="name" [(ngModel)]="newComponent.name" placeholder="name">
-    </div>
-    <div>
-        <label for="description">Description: </label>
-        <input id="description" [(ngModel)]="newComponent.description" placeholder="description">
-    </div>
-    <div>
-        <label for="manufacturer">Manufacturer: </label>
-        <input id="manufacturer" [(ngModel)]="newComponent.manufacturer" placeholder="manufacturer">
-    </div>
-    <div>
-        <label for="model">Model: </label>
-        <input id="model" [(ngModel)]="newComponent.model" placeholder="model">
-    </div>
-    <div>
-        <label for="installDate">Date Installed: </label>
-        <input id="installDate" [(ngModel)]="newComponent.installDate" placeholder="installDate">
-    </div>
+    <mat-form-field>
+        <mat-label>Category</mat-label>
+        <input matInput name="category" [(ngModel)]="newComponent.category" placeholder="category">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="newComponent.name" placeholder="name">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Description</mat-label>
+        <input matInput name="description" [(ngModel)]="newComponent.description" placeholder="description">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Manufacturer</mat-label>
+        <input matInput name="manufacturer" [(ngModel)]="newComponent.manufacturer" placeholder="manufacturer">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Model</mat-label>
+        <input matInput name="model" [(ngModel)]="newComponent.model" placeholder="model">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Date Installed</mat-label>
+        <input matInput name="installDate" [(ngModel)]="newComponent.installDate" placeholder="installDate">
+    </mat-form-field>
 
-    <br>
     <div><b>Service Interval</b></div>
-    <div>
-        <label for="serviceDistance">Maximum Distance (m): </label>
-        <input id="serviceDistance" [(ngModel)]="serviceInterval.distance" placeholder="distance (m)">
-    </div>
+    <mat-form-field>
+        <mat-label>Maximum Distance (m)</mat-label>
+        <input matInput name="distance" [(ngModel)]="serviceInterval.distance" placeholder="distance (m)">
+    </mat-form-field>
 
-    <br>
-    <button type="submit" (click)="onAdd(newComponent)">Submit</button>
-</div>
+    <button mat-raised-button class="mat-accent" type="submit" (click)="onAdd(newComponent)">Submit</button>
+</form>
 
 <div *ngIf="selectedComponent">
     <app-component-detail [component]="selectedComponent"></app-component-detail>
