@@ -1,10 +1,12 @@
-<h1>Component Tracker</h1>
+<mat-toolbar color="primary">
+    <a mat-button routerLink="/home"><h1>Component Tracker</h1></a>
+    <span class="spacer"></span>
+    <a mat-button routerLink="/components">My Components</a>
+    <span class="spacer"></span>
+    <a mat-button routerLink="/login">Login</a>
+    <a mat-button routerLink="/profile">Profile</a>
+</mat-toolbar>
 
-<nav>
-    <a routerLink="/home">Home</a> | 
-    <a routerLink="/components">My Components</a> |
-    <a routerLink="/login">Login</a> |
-    <a routerLink="/profile">Profile</a>
-</nav>
-
-<router-outlet></router-outlet>
+<mat-sidenav-container class="app-content">
+    <router-outlet></router-outlet>
+</mat-sidenav-container>
