@@ -6,11 +6,14 @@ import { CookieService } from 'ngx-cookie-service';
 import { ComponentTrackerApiService } from '../../services/component-tracker-api.service';
 import { User } from '../../models/user';
 import { AuthService } from '../../services/auth.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, MatButtonModule, MatInputModule, MatFormFieldModule],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss'
 })

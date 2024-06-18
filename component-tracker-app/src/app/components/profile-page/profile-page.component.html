@@ -10,42 +10,64 @@
     <p>This is your profile</p>
 
     <form>
-        <label for="name">Name:</label>
-        <input id="name" name="name" readonly disabled type="text" value="{{user?.name}}" />
-        <br><br>
-        <label for="email">Email:</label>
-        <input id="email" name="email" readonly disabled type="text" value="{{user?.email}}" />
-        <br><br>
-        <label for="provider">Provider:</label>
-        <input id="provider" name="provider" readonly disabled type="text" value="{{user?.provider}}" />
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput name="name" readonly type="text" value="{{user?.name}}">
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput name="email" readonly type="text" value="{{user?.email}}">
+        </mat-form-field>  
+
+        <mat-form-field>
+            <mat-label>Provider</mat-label>
+            <input matInput name="provider" readonly type="text" value="{{user?.provider}}">
+        </mat-form-field>
+
+        <br>
+
+        <mat-form-field>
+            <mat-label>Total Rides</mat-label>
+            <input matInput name="totalRides" value="{{rideStats?.totalRides}}" >
+        </mat-form-field>
+        
+        <mat-form-field>
+            <mat-label>Total Distance</mat-label>
+            <input matInput name="totalDistance" value="{{rideStats?.totalDistance}} meters" >
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Total Time</mat-label>
+            <input matInput name="totalTime" value="{{rideStats?.totalTime}} seconds" >
+        </mat-form-field>              
     </form>
 
-    <p>
-        <button (click)="logout()">Logout</button>
-    </p>
+    <button  mat-raised-button class="mat-primary" (click)="logout()">Logout</button>
 
-    <div>Total Rides: {{ rideStats?.totalRides }}</div>
-    <div>Total Distance: {{ rideStats?.totalDistance }}</div>
-    <div>Total Time: {{ rideStats?.totalTime }}</div>
+    <hr>
 
-    <p></p>
     <!-- Show a link to integrate Strava if not integrated yet -->
-    <div [hidden]="stravaUser">
-        <button (click)="integrateStrava()">Connect with Strava</button>
-    </div>
-    <div [hidden]="!stravaUser">
-        <button (click)="disconnectStrava()">Disconnect Strava</button>
-        <button (click)="syncronizeStravaRides()">Sync Strava Rides</button>
-    </div>
-
-    <p></p>
-    <!-- Show a link to integrate Ride with GPS if not integrated yet -->
-    <div [hidden]="rwgpsUser">
-        <button (click)="integrateRwgps()">Connect with Ride with GPS</button>
-    </div>
-    <div [hidden]="!rwgpsUser">
-        <button (click)="disconnectRwgps()">Disconnect Ride with GPS</button>
-        <button (click)="syncronizeRwgpsRides()">Sync Ride with GPS Rides</button>
+    <div>
+        <h3>Strava</h3>
+        <div [hidden]="stravaUser">
+            <button mat-raised-button class="integrate-button" (click)="integrateStrava()">Connect with Strava</button>
+        </div>
+        <div [hidden]="!stravaUser">
+            <button mat-raised-button class="integrate-button" (click)="disconnectStrava()">Disconnect Strava</button>
+            <button mat-raised-button class="integrate-button" (click)="syncronizeStravaRides()">Sync Strava Rides</button>
+        </div>
     </div>
 
+    <div>
+        <h3>Ride with GPS</h3>
+        <!-- Show a link to integrate Ride with GPS if not integrated yet -->
+        <div [hidden]="rwgpsUser">
+            <button mat-raised-button class="integrate-button" (click)="integrateRwgps()">Connect with Ride with GPS</button>
+        </div>
+        <div [hidden]="!rwgpsUser">
+            <button mat-raised-button class="integrate-button" (click)="disconnectRwgps()">Disconnect Ride with GPS</button>
+            <button mat-raised-button class="integrate-button" (click)="syncronizeRwgpsRides()">Sync Ride with GPS Rides</button>
+        </div>
+    </div>
 </div>  
