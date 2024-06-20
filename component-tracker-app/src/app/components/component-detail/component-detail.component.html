@@ -1,68 +1,44 @@
-<div *ngIf="component">
-    <mat-list>
-        <p matSubheader class="mat-headline-4">{{component.name}}</p>
-        <mat-list-item>
-            <span matListItemTitle>Category</span>
-            <span matListItemLine>{{component.category}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Name</span>
-            <span matListItemLine>{{component.name}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Description</span>
-            <span matListItemLine>{{component.description}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Manufacturer</span>
-            <span matListItemLine>{{component.manufacturer}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Model</span>
-            <span matListItemLine>{{component.model}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Installed?</span>
-            <span matListItemLine>{{component.isInstalled}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Install Date</span>
-            <span matListItemLine>{{component.installDate}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Retire Date</span>
-            <span matListItemLine>{{component.uninstallDate}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Total Rides (m)</span>
-            <span matListItemLine>{{component.totalRides}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Total Distance (m)</span>
-            <span matListItemLine>{{component.totalDistance}}</span>
-        </mat-list-item>
-
-        <mat-list-item>
-            <span matListItemTitle>Total Time (s)</span>
-            <span matListItemLine>{{component.totalTime}}</span>
-        </mat-list-item>
-
-        <mat-divider></mat-divider>
-        <p matSubheader class="mat-headline-4">Service Intervals</p>
-        @for (service of component.serviceIntervals; track service) {
-            <mat-list-item>
-               <span matListItemTitle>{{service.name}}</span>
-               <span matListItemLine>{{service.description}} | {{service.distance}}m</span>
-            </mat-list-item>
-          }
-    </mat-list>
- </div>
+<mat-card class="component-card" appearance="outlined">
+    <mat-card-header>
+        <img mat-card-avatar [src]="getComponentImage()">
+        <mat-card-title>{{component.name}}</mat-card-title>
+        <mat-card-subtitle>{{component.category}}</mat-card-subtitle>
+        <mat-card-subtitle>{{component.manufacturer}}</mat-card-subtitle>
+        <mat-card-subtitle>{{component.model}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <p>{{component.description}}</p>
+        <form>
+            <p>Installed on {{component.installDate | date:'longDate'}}</p>
+            <mat-form-field class="wide-field">
+                <mat-label>Total Rides</mat-label>
+                <input matInput name="name" readonly type="text" value="{{component.totalRides}}">
+            </mat-form-field>
+            <mat-form-field class="wide-field">
+                <mat-label>Total Distance (m)</mat-label>
+                <input matInput name="name" readonly type="text" value="{{component.totalDistance}}">
+            </mat-form-field>
+            <mat-form-field class="wide-field">
+                <mat-label>Total Time (s)</mat-label>
+                <input matInput name="name" readonly type="text" value="{{component.totalTime}}">
+            </mat-form-field>
+        </form>
+        <mat-card-footer>
+            @if (component.serviceIntervals?.length) {
+            <p>Service Intervals</p>
+            @for (service of component.serviceIntervals; track service) {
+                <form>
+                    <mat-form-field class="wide-field">
+                        <mat-label>{{service.name}}</mat-label>
+                        <input matInput name="name" readonly type="text" value="{{service.description}} | {{service.distance}}m">
+                    </mat-form-field> 
+                </form>
+            }
+        }
+        </mat-card-footer>         
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-raised-button (click)="onClickEdit()">Edit</button>
+        <button mat-raised-button (click)="onClickDelete()">Delete</button>
+    </mat-card-actions>
+</mat-card>

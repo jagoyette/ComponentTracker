@@ -1,32 +1,7 @@
 <h3>My Components</h3>
 
-
-<table mat-table [dataSource]="myComponents">
-  <ng-container matColumnDef="category">
-    <th mat-header-cell *matHeaderCellDef>Category</th>
-    <td mat-cell *matCellDef="let element">{{element.category}}</td>
-  </ng-container>
-
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let element">{{element.name}}</td>
-  </ng-container> 
-
-  <ng-container matColumnDef="select">
-    <th mat-header-cell *matHeaderCellDef>Select</th>
-    <td mat-cell *matCellDef="let element"><button mat-raised-button class="mat-primary" (click)="onSelect(element)">Select</button></td>
-  </ng-container>
-
-  <ng-container matColumnDef="delete">
-    <th mat-header-cell *matHeaderCellDef>Delete</th>
-    <td mat-cell *matCellDef="let element"><button mat-raised-button class="mat-primary" (click)="onDelete(element)">Delete</button></td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>  
-</table>
-
 <button mat-raised-button class="mat-primary" (click)="onAddComponent()">Add New Component</button>
+
 <form *ngIf="newComponent && !selectedComponent">
     <br>
     <div><b>Create a new component</b></div>
@@ -64,6 +39,12 @@
     <button mat-raised-button class="mat-accent" type="submit" (click)="onAdd(newComponent)">Submit</button>
 </form>
 
-<div *ngIf="selectedComponent">
-    <app-component-detail [component]="selectedComponent"></app-component-detail>
+
+<div class="component-container">
+  @for (component of myComponents; track component) {
+      <app-component-detail
+      class="component"
+      [component]="component" 
+      (onDelete)="onDelete(component)"></app-component-detail>
+  }
 </div>

@@ -11,11 +11,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @Component({
   selector: 'app-components-page',
   standalone: true,
-  imports: [ComponentDetailComponent, NgFor, NgIf, FormsModule, MatButtonModule, MatTableModule, MatInputModule, MatFormFieldModule],
+  imports: [ComponentDetailComponent, NgFor, NgIf, FormsModule, MatButtonModule, MatTableModule, MatInputModule, MatFormFieldModule, MatGridListModule],
   templateUrl: './components-page.component.html',
   styleUrl: './components-page.component.scss'
 })
