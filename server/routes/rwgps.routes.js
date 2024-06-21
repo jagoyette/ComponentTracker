@@ -7,6 +7,8 @@ const Utils = require("../utils/network");
 const { isAuthenticated } = require('../middleware/authenticated');
 const RwgpsAthlete = require('../models/rwgps.athlete');
 const RwgpsToken = require("../models/rwgps.token");
+const RwgpsWebhookNotification = require('../models/rwgps.webhook');
+
 const RwgpsController = require('../controllers/rwgpsAthlete');
 const ComponentController = require('../controllers/component');
 
@@ -432,6 +434,33 @@ router.get('/rwgps/failure', (req, res) => {
     console.info('RWGPS integration failed');
     res.send('RWGPS integration failed');
 });
+
+
+router.post('/rwgps/webhook', async (req, res) => {
+    console.info('Received RWGPS Webhook');
+    res.status(200).send({
+        success: true
+    });
+
+    setTimeout( async () => {
+        console.log('Processing webhook notifications');
+        const { notifications } = req.body;
+        if (notifications) {
+            console.log('Received ' + notifications.length + ' notifications');
+            
+            // extract header info
+            const apiKey = req.headers['x-rwgps-api-key'];
+            const signature = req.headers['x-rwgps-signature'];
+
+            // Save each notification
+            for (let index = 0; index < notifications.length; index++) {
+                const notification = RwgpsWebhookNotification.createFromRwgps(notifications[index], apiKey, signature);
+                const model = await RwgpsWebhookNotification.create(notification);
+            }
+        }
+    }, 0);
+});
+
 
 // export the router
 module.exports = router;
